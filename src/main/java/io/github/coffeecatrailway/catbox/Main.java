@@ -1,6 +1,8 @@
 package io.github.coffeecatrailway.catbox;
 
 import imgui.ImGui;
+import io.github.coffeecatrailway.catbox.boxes.CatBoxI;
+import io.github.coffeecatrailway.catbox.boxes.ShapeCatBox;
 import io.github.coffeecatrailway.engine.renderer.shapes.ShapeRenderer;
 import io.github.coffeecatrailway.engine.renderer.window.ImGUIWrapper;
 import io.github.coffeecatrailway.engine.renderer.window.Window;
@@ -34,6 +36,8 @@ public class Main
 	private final ImGUIWrapper imgui = new ImGUIWrapper();
 	private ShapeRenderer shapeRenderer;
 	private final Matrix4f pvm = new Matrix4f();
+	
+	private CatBoxI catBox;
 	
 	// Options
 	private boolean vSync = true, pauseFixed = true, btnStepFixed = false;
@@ -75,6 +79,9 @@ public class Main
 		
 		this.shapeRenderer = new ShapeRenderer(1);
 		this.shapeRenderer.init();
+		
+		this.catBox = new ShapeCatBox();
+		this.catBox.init();
 	}
 	
 	private void run()
@@ -82,8 +89,6 @@ public class Main
 		float accumulatedSeconds = 0.f;
 		this.sysTimer.tick();
 		this.updateTimer.tick();
-		
-		float r = Math.PI_OVER_4_f;
 		
 		System.out.println("Starting main loop");
 		while (!glfwWindowShouldClose(this.window.getHandle()))
@@ -94,7 +99,7 @@ public class Main
 			accumulatedSeconds += this.sysTimer.getElapsedSeconds();
 			
 			// update
-//			this.simulator.update(this.sysTimer.getElapsedSeconds());
+			this.catBox.update(this.sysTimer.getElapsedSeconds());
 			
 			if (accumulatedSeconds > this.cycleTime)
 			{
@@ -102,7 +107,7 @@ public class Main
 				this.updateTimer.tick();
 				if (!this.pauseFixed || this.btnStepFixed)
 				{
-//					this.simulator.fixedUpdate(this.updateTimer.getElapsedSeconds());
+					this.catBox.fixedUpdate(this.updateTimer.getElapsedSeconds());
 					this.stepCount++;
 					this.btnStepFixed = false;
 				}
@@ -115,17 +120,7 @@ public class Main
 			glClearColor(this.backgroundColor[0], this.backgroundColor[1], this.backgroundColor[2], 1.f);
 			glClear(GL_COLOR_BUFFER_BIT);
 			
-//			this.simulator.render();
-			this.shapeRenderer.pushCircle(new Vector2f(0.f), new Vector3f(1.f), 10.f, .2f);
-			this.shapeRenderer.pushCircle(new Vector2f(0.f, 40.f), new Vector3f(1.f), 5.f, .2f);
-			
-			r += .01f;
-			this.shapeRenderer.pushBox(new Vector2f(30.f, 40.f), new Vector3f(1.f), new Vector2f((Math.sin(r * 2.f) * .25f + .75f) * 20.f, (Math.cos(r * 2.f) * .25f + .75f) * 40.f), r, .1f);
-			this.shapeRenderer.pushBox(new Vector2f(30.f, 0.f), new Vector3f(0.f, 1.f, 0.f), new Vector2f(10.f), r, .2f);
-			this.shapeRenderer.pushBox(new Vector2f(30.f, -40.f), new Vector3f(1.f), new Vector2f(20.f), r, Math.sin(r * 2.f) * .25f + .25f);
-			
-			this.shapeRenderer.pushLine(new Vector2f(-30.f, 40.f), new Vector2f(-30.f, 80.f), new Vector3f(1.f), 5.f, .05f);
-			this.shapeRenderer.pushLine(new Vector2f(-30.f, 0.f), new Vector3f(1.f), 40.f, 5.f, Math.PI_OVER_4_f, .05f);
+			this.catBox.render(this.shapeRenderer);
 			
 			this.shapeRenderer.drawFlush(this.pvm);
 			this.imgui.render();
@@ -181,7 +176,7 @@ public class Main
 		if (ImGui.begin("Simulation"))
 		{
 			halfWidth = ImGui.getWindowWidth() * .5f;
-//			this.simulator.gui(halfWidth);
+			this.catBox.gui(halfWidth);
 		}
 		ImGui.end();
 	}
