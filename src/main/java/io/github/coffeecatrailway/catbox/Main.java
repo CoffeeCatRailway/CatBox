@@ -1,0 +1,205 @@
+package io.github.coffeecatrailway.catbox;
+
+import imgui.ImGui;
+import io.github.coffeecatrailway.engine.renderer.shapes.ShapeRenderer;
+import io.github.coffeecatrailway.engine.renderer.window.ImGUIWrapper;
+import io.github.coffeecatrailway.engine.renderer.window.Window;
+import org.joml.Math;
+import org.joml.Matrix4f;
+import org.joml.Vector2f;
+import org.joml.Vector3f;
+import org.lwjgl.Version;
+import org.lwjgl.glfw.GLFWFramebufferSizeCallbackI;
+
+import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.opengl.GL11.*;
+
+public class Main
+{
+	/*
+	 * Check List:
+	 * [O] Window/LWJGL
+	 * [O] ImGUI
+	 * [X] Renderer, queue system for basic shapes (Circle, Box, Line)
+	 * [X] Physics engine:
+	 *    [X] Basic forces
+	 *    [X] Simple collision detection/response (Circle, Box, Line)
+	 *    [X] Constraints (Springs/Soft, Hard)
+	 *    [X] Advanced-Line (polygon) collision detection/response
+	 *    [X] Rigid body
+	 */
+	
+	// System
+	private Window window;
+	private final ImGUIWrapper imgui = new ImGUIWrapper();
+	private ShapeRenderer shapeRenderer;
+	private final Matrix4f pvm = new Matrix4f();
+	
+	// Options
+	private boolean vSync = true, pauseFixed = true, btnStepFixed = false;
+	
+	private float[] backgroundColor = {
+			// 0.f, 0.f, 0.f
+			95.f / 255.f,
+			68.f / 255.f,
+			151.f / 255.f
+	};
+	
+	// Timing
+	private int frameCount = 0, stepCount = 0;
+	private int ticksPerSecond = 60;
+	private float cycleTime = 1.f / (float) ticksPerSecond;
+	private Timer sysTimer = new Timer(), updateTimer = new Timer();
+	
+	private void init()
+	{
+		System.out.println("CatBox");
+		System.out.println("LWJGL: " + Version.getVersion());
+		System.out.println("ImGUI: " + ImGui.getVersion());
+		
+		this.window = new Window(800, 800);
+		this.window.init("CatBox", true, GLFW_PLATFORM_X11); // Wrong, we're on wayland but anyway...
+		GLFWFramebufferSizeCallbackI callback = (window, width, height) -> {
+			float aspect = (float) width / (float) height;
+			boolean aspectOne = aspect >= 1.f;
+			float left = -100.f * (aspectOne ? aspect : 1.f);
+			float right = 100.f * (aspectOne ? aspect : 1.f);
+			float bottom = -100.f / (aspectOne ? 1.f : aspect);
+			float top = 100.f / (aspectOne ? 1.f : aspect);
+			this.pvm.setOrtho(left, right, bottom, top, -1.f, 1.f);
+		};
+		this.window.setFramebufferCallback(callback);
+		callback.invoke(this.window.getHandle(), this.window.getWidth(), this.window.getHeight());
+		
+		this.imgui.init(this.window.getHandle());
+		
+		this.shapeRenderer = new ShapeRenderer(1);
+		this.shapeRenderer.init();
+	}
+	
+	private void run()
+	{
+		float accumulatedSeconds = 0.f;
+		this.sysTimer.tick();
+		this.updateTimer.tick();
+		
+		float r = Math.PI_OVER_4_f;
+		
+		System.out.println("Starting main loop");
+		while (!glfwWindowShouldClose(this.window.getHandle()))
+		{
+			
+			// Get amount of time passed for one cycle
+			this.sysTimer.tick();
+			accumulatedSeconds += this.sysTimer.getElapsedSeconds();
+			
+			// update
+//			this.simulator.update(this.sysTimer.getElapsedSeconds());
+			
+			if (accumulatedSeconds > this.cycleTime)
+			{
+				accumulatedSeconds -= this.cycleTime;
+				this.updateTimer.tick();
+				if (!this.pauseFixed || this.btnStepFixed)
+				{
+//					this.simulator.fixedUpdate(this.updateTimer.getElapsedSeconds());
+					this.stepCount++;
+					this.btnStepFixed = false;
+				}
+			}
+			
+			this.imgui.update();
+			this.gui();
+			
+			// render
+			glClearColor(this.backgroundColor[0], this.backgroundColor[1], this.backgroundColor[2], 1.f);
+			glClear(GL_COLOR_BUFFER_BIT);
+			
+//			this.simulator.render();
+			this.shapeRenderer.pushCircle(new Vector2f(0.f), new Vector3f(1.f), 10.f, .2f);
+			this.shapeRenderer.pushCircle(new Vector2f(0.f, 40.f), new Vector3f(1.f), 5.f, .2f);
+			
+			r += .01f;
+			this.shapeRenderer.pushBox(new Vector2f(30.f, 40.f), new Vector3f(1.f), new Vector2f((Math.sin(r * 2.f) * .25f + .75f) * 20.f, (Math.cos(r * 2.f) * .25f + .75f) * 40.f), r, .1f);
+			this.shapeRenderer.pushBox(new Vector2f(30.f, 0.f), new Vector3f(0.f, 1.f, 0.f), new Vector2f(10.f), r, .2f);
+			this.shapeRenderer.pushBox(new Vector2f(30.f, -40.f), new Vector3f(1.f), new Vector2f(20.f), r, Math.sin(r * 2.f) * .25f + .25f);
+			
+			this.shapeRenderer.pushLine(new Vector2f(-30.f, 40.f), new Vector2f(-30.f, 80.f), new Vector3f(1.f), 5.f, .05f);
+			this.shapeRenderer.pushLine(new Vector2f(-30.f, 0.f), new Vector3f(1.f), 40.f, 5.f, Math.PI_OVER_4_f, .05f);
+			
+			this.shapeRenderer.drawFlush(this.pvm);
+			this.imgui.render();
+			
+			this.frameCount++;
+			
+			// Swap buffer & poll events
+			glfwSwapBuffers(this.window.getHandle());
+			glfwPollEvents();
+		}
+	}
+	
+	private void gui()
+	{
+		float halfWidth;
+		if (ImGui.begin("Info"))
+		{
+			halfWidth = ImGui.getWindowWidth() * .5f;
+			ImGui.text(String.format("FPS: %f\nFrames: %d\nSteps Fixed: %d", ImGui.getIO().getFramerate(), this.frameCount, this.stepCount));
+			if (ImGui.checkbox("Vsync", this.vSync))
+			{
+				this.vSync = !this.vSync;
+				this.window.setVSync(this.vSync);
+			}
+			if (ImGui.checkbox("Pause Fixed", this.pauseFixed))
+				this.pauseFixed = !this.pauseFixed;
+			if (this.pauseFixed)
+			{
+				ImGui.sameLine(0.f, 10.f);
+				if (ImGui.smallButton("Step"))
+					this.btnStepFixed = true;
+			}
+			ImGui.separator();
+			
+			ImGui.text(String.format("Delta time: %fs", this.sysTimer.getElapsedSeconds()));
+			ImGui.text(String.format("Fixed delta time: %fs", this.updateTimer.getElapsedSeconds()));
+			
+			ImGui.pushItemWidth(halfWidth);
+			int[] vi = {this.ticksPerSecond};
+			if (ImGui.dragInt("Ticks Per Second", vi, 10, 10, 100, "%d"))
+			{
+				this.ticksPerSecond = vi[0];
+				this.cycleTime = 1.f / (float) this.ticksPerSecond;
+			}
+			ImGui.text(String.format("Cycle time (1/tps): %fs", this.cycleTime));
+			ImGui.popItemWidth();
+			ImGui.separator();
+			
+			ImGui.colorEdit3("Clear Color", this.backgroundColor);
+		}
+		ImGui.end();
+		
+		if (ImGui.begin("Simulation"))
+		{
+			halfWidth = ImGui.getWindowWidth() * .5f;
+//			this.simulator.gui(halfWidth);
+		}
+		ImGui.end();
+	}
+	
+	private void destroy()
+	{
+		System.out.println("Cleaning up");
+//		this.simulator.destroy();
+		this.shapeRenderer.destroy();
+		this.imgui.destroy();
+		this.window.destroy();
+	}
+	
+	static void main()
+	{
+		Main main = new Main();
+		main.init();
+		main.run();
+		main.destroy();
+	}
+}
