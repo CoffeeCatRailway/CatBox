@@ -42,15 +42,18 @@ public class ShapeCatBox implements CatBoxI
 		
 		Vector2f p1 = new Vector2f(-30.f, 40.f);
 		Vector2f p2 = new Vector2f(p1);
-		p2.x += Math.sin(this.radians) * 40.f;
-		p2.y += Math.cos(this.radians) * 40.f;
+		p2.x += Math.cos(this.radians) * 40.f;
+		p2.y += Math.sin(this.radians) * 20.f;
+		
 		shapeRenderer.pushLine(p1, p2, new Vector3f(1.f), 5.f, .05f);
 		shapeRenderer.pushLine(new Vector2f(-30.f, 0.f), new Vector3f(1.f), 40.f, 5.f, this.radians, .05f);
+		
+		shapeRenderer.pushCircle(p2, new Vector3f(1.f), 5.f, .2f);
 	}
 	
 	@Override
 	public void gui(float halfWidth)
 	{
-		ImGui.text(String.format("Radians: %.2f\nDegrees: %.2f", this.radians, Math.toDegrees(this.radians)));
+		ImGui.text(String.format("Radians: %.3f\nDegrees: %.3f", this.radians, Math.toDegrees(this.radians)));
 	}
 }

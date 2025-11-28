@@ -188,9 +188,7 @@ public class ShapeRenderer
 		this.buffer.put(delta.length());
 		this.buffer.put(thickness);
 		
-//		System.out.println(Math.atan2(delta.y, delta.x));
-//		System.out.println(Math.PI_OVER_4_f);
-		this.buffer.put(Math.atan2(delta.y, delta.x)); // TODO: fix?
+		this.buffer.put(Math.atan2(delta.y, delta.x));
 		
 		this.buffer.put(outline);
 	}
