@@ -13,6 +13,11 @@ in vec2 f_uv;
 
 out vec4 FragColor;
 
+float sdCircle(in vec2 p, in float r)
+{
+	return length(p) - r;
+}
+
 float sdBox(in vec2 p, in vec2 b)
 {
 	vec2 d = abs(p) - b;
@@ -21,33 +26,17 @@ float sdBox(in vec2 p, in vec2 b)
 
 void main()
 {
+	float l;
 	if (f_shapeId == ID_CIRCLE)
-	{
-		float l = length(f_uv);
-		if (l > 1.)
-			discard;
-		if (l > 1. - f_outline)
-			FragColor =	vec4(0., 0., 0., 1.);
-		else
-			FragColor = vec4(f_color, 1.);
-	} else if (f_shapeId == ID_BOX)
-	{
-		float l = sdBox(f_uv, f_size / max(f_size.x, f_size.y));
-		if (l > 0.)
-			discard;
-		if (l > -f_outline)
-			FragColor = vec4(0., 0., 0., 1.);
-		else
-			FragColor = vec4(f_color, 1.);
-	} else if (f_shapeId == ID_LINE)
-	{
-		float l = sdBox(f_uv, f_size / max(f_size.x, f_size.y));
-		if (l > 0.)
-			discard;
-		if (l > -f_outline)
-			FragColor = vec4(0., 0., 0., 1.);
-		else
-			FragColor = vec4(f_color, 1.);
-	} else
-		FragColor = vec4(f_uv * .5 + .5, 0., 1.);
+		l = sdCircle(f_uv, 1.);
+	else
+		l = sdBox(f_uv, f_size / max(f_size.x, f_size.y));
+	
+	if (l > 0.)
+		discard;
+	if (l > -f_outline)
+		FragColor =	vec4(0., 0., 0., 1.);
+	else
+		FragColor = vec4(f_color, 1.);
+//	FragColor = vec4(f_uv * .5 + .5, 0., 1.);
 }
