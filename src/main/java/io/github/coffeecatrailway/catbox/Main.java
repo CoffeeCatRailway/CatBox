@@ -38,6 +38,7 @@ public class Main
 	
 	// Options
 	private boolean vSync = true, pauseFixed = true, btnStepFixed = false;
+	private float worldView = 100.f;
 	
 	private float[] backgroundColor = {
 			// 0.f, 0.f, 0.f
@@ -60,17 +61,9 @@ public class Main
 		
 		this.window = new Window(1066, 600);
 		this.window.init("CatBox", true, GLFW_PLATFORM_X11); // Wrong, we're on wayland but anyway...
-		GLFWFramebufferSizeCallbackI callback = (window, width, height) -> {
-			float aspect = (float) width / (float) height;
-			boolean aspectOne = aspect >= 1.f;
-			float left = -100.f * (aspectOne ? aspect : 1.f);
-			float right = 100.f * (aspectOne ? aspect : 1.f);
-			float bottom = -100.f / (aspectOne ? 1.f : aspect);
-			float top = 100.f / (aspectOne ? 1.f : aspect);
-			this.pvm.setOrtho(left, right, bottom, top, -1.f, 1.f);
-		};
+		GLFWFramebufferSizeCallbackI callback = (window, width, height) -> this.updatePVM((float) width / (float) height);
 		this.window.setFramebufferCallback(callback);
-		callback.invoke(this.window.getHandle(), this.window.getWidth(), this.window.getHeight());
+		this.updatePVM((float) this.window.getWidth() / (float) this.window.getHeight());
 		
 		this.imgui.init(this.window.getHandle());
 		
@@ -79,6 +72,16 @@ public class Main
 		
 		this.catBox = new ShapeCatBox();
 		this.catBox.init();
+	}
+	
+	private void updatePVM(float aspect)
+	{
+		boolean aspectOne = aspect >= 1.f;
+		float left = -this.worldView * (aspectOne ? aspect : 1.f);
+		float right = this.worldView * (aspectOne ? aspect : 1.f);
+		float bottom = -this.worldView / (aspectOne ? 1.f : aspect);
+		float top = this.worldView / (aspectOne ? 1.f : aspect);
+		this.pvm.setOrtho(left, right, bottom, top, -1.f, 1.f);
 	}
 	
 	private void run()
