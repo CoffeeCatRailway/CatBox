@@ -8,9 +8,6 @@ import org.lwjgl.system.MemoryUtil;
 
 import java.nio.FloatBuffer;
 
-//import static org.lwjgl.opengl.GL11.*;
-//import static org.lwjgl.opengl.GL15.*;
-//import static org.lwjgl.opengl.GL30.*;
 import static org.lwjgl.opengl.GL45.*;
 
 public class ShapeRenderer
@@ -200,13 +197,14 @@ public class ShapeRenderer
 		this.shader.bind();
 		this.shader.setUniformMatrix4f("u_transform", pvm);
 		
+		int drawCount = this.buffer.position() / FLOATS;
+		
 		this.buffer.clear();
 		glNamedBufferData(this.vbo, this.buffer, GL_DYNAMIC_DRAW);
 //		glNamedBufferSubData(this.vbo, 0L, this.buffer);
 		
-		int count = this.buffer.capacity() / FLOATS;
 		glBindVertexArray(this.vao);
-		glDrawArrays(GL_POINTS, 0, count);
+		glDrawArrays(GL_POINTS, 0, drawCount);
 		
 		this.buffer.rewind();
 	}
