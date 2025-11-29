@@ -3,6 +3,7 @@ package io.github.coffeecatrailway.catbox;
 import imgui.ImGui;
 import io.github.coffeecatrailway.catbox.boxes.CatBoxI;
 import io.github.coffeecatrailway.catbox.boxes.ShapeCatBox;
+import io.github.coffeecatrailway.engine.renderer.LineRenderer;
 import io.github.coffeecatrailway.engine.renderer.ShapeRenderer;
 import io.github.coffeecatrailway.engine.renderer.window.ImGUIWrapper;
 import io.github.coffeecatrailway.engine.renderer.window.Window;
@@ -21,7 +22,7 @@ public class Main
 	 * [O] Window/LWJGL
 	 * [O] ImGUI
 	 * [O] Renderer, queue system for basic shapes (Circle, Box, Line)
-	 * [X] Debug line renderer
+	 * [O] Debug line renderer
 	 * [X] Physics engine:
 	 *    [X] Basic forces
 	 *    [X] Simple collision detection/response (Circle, Box, Line)
@@ -33,8 +34,9 @@ public class Main
 	// System
 	private Window window;
 	private final ImGUIWrapper imgui = new ImGUIWrapper();
+	private final Matrix4f transformMatrix = new Matrix4f();
 	private ShapeRenderer shapeRenderer;
-	private final Matrix4f pvm = new Matrix4f();
+	private LineRenderer lineRenderer;
 	
 	private CatBoxI catBox;
 	
@@ -63,27 +65,30 @@ public class Main
 		
 		this.window = new Window(Math.roundHalfDown(1600.f * .8f), Math.roundHalfDown(900.f * .8f));
 		this.window.init("CatBox", true, GLFW_PLATFORM_X11); // Wrong, we're on wayland but anyway...
-		GLFWFramebufferSizeCallbackI callback = (window, width, height) -> this.updatePVM((float) width / (float) height);
+		GLFWFramebufferSizeCallbackI callback = (window, width, height) -> this.updateTransform((float) width / (float) height);
 		this.window.setFramebufferCallback(callback);
-		this.updatePVM((float) this.window.getWidth() / (float) this.window.getHeight());
+		this.updateTransform((float) this.window.getWidth() / (float) this.window.getHeight());
 		
 		this.imgui.init(this.window.getHandle());
 		
-		this.shapeRenderer = new ShapeRenderer(1);
+		this.shapeRenderer = new ShapeRenderer(10);
 		this.shapeRenderer.init();
+		
+		this.lineRenderer = new LineRenderer(10);
+		this.lineRenderer.init();
 		
 		this.catBox = new ShapeCatBox();
 		this.catBox.init();
 	}
 	
-	private void updatePVM(float aspect)
+	private void updateTransform(float aspect)
 	{
 		boolean aspectOne = aspect >= 1.f;
 		float left = -this.worldView * (aspectOne ? aspect : 1.f);
 		float right = this.worldView * (aspectOne ? aspect : 1.f);
 		float bottom = -this.worldView / (aspectOne ? 1.f : aspect);
 		float top = this.worldView / (aspectOne ? 1.f : aspect);
-		this.pvm.setOrtho(left, right, bottom, top, -1.f, 1.f);
+		this.transformMatrix.setOrtho(left, right, bottom, top, -1.f, 1.f);
 	}
 	
 	private void run()
@@ -122,9 +127,10 @@ public class Main
 			glClearColor(this.backgroundColor[0], this.backgroundColor[1], this.backgroundColor[2], 1.f);
 			glClear(GL_COLOR_BUFFER_BIT);
 			
-			this.catBox.render(this.shapeRenderer);
+			this.catBox.render(this.shapeRenderer, this.lineRenderer);
 			
-			this.shapeRenderer.drawFlush(this.pvm);
+			this.shapeRenderer.drawFlush(this.transformMatrix);
+			this.lineRenderer.drawFlush(this.transformMatrix);
 			this.imgui.render();
 			
 			this.frameCount++;
@@ -188,7 +194,8 @@ public class Main
 	private void destroy()
 	{
 		System.out.println("Cleaning up");
-//		this.simulator.destroy();
+		this.catBox.destroy();
+		this.lineRenderer.destroy();
 		this.shapeRenderer.destroy();
 		this.imgui.destroy();
 		this.window.destroy();

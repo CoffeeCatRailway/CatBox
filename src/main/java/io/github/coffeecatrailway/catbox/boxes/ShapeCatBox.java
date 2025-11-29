@@ -1,6 +1,7 @@
 package io.github.coffeecatrailway.catbox.boxes;
 
 import imgui.ImGui;
+import io.github.coffeecatrailway.engine.renderer.LineRenderer;
 import io.github.coffeecatrailway.engine.renderer.ShapeRenderer;
 import org.joml.Math;
 import org.joml.Vector2f;
@@ -30,7 +31,7 @@ public class ShapeCatBox implements CatBoxI
 	}
 	
 	@Override
-	public void render(ShapeRenderer shapeRenderer)
+	public void render(ShapeRenderer shapeRenderer, LineRenderer lineRenderer)
 	{
 		shapeRenderer.pushCircle(new Vector2f(0.f), new Vector3f(1.f), 10.f, .2f);
 		shapeRenderer.pushCircle(new Vector2f(0.f, 40.f), new Vector3f(1.f), 5.f, .2f);
@@ -52,6 +53,13 @@ public class ShapeCatBox implements CatBoxI
 		shapeRenderer.pushLine(new Vector2f(-50.f, 0.f), new Vector3f(1.f), 40.f, 5.f, this.radians, .05f);
 		
 		shapeRenderer.pushCircle(p2, new Vector3f(1.f), 4.f, .2f);
+		
+		lineRenderer.pushLine(new Vector2f(-100.f), new Vector3f(1.f), new Vector2f(100.f), new Vector3f(1.f));
+	}
+	
+	@Override
+	public void destroy()
+	{
 	}
 	
 	@Override

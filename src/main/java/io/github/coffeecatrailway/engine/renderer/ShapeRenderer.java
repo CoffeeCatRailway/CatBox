@@ -189,13 +189,13 @@ public class ShapeRenderer
 		this.buffer.put(outline);
 	}
 	
-	public void drawFlush(Matrix4f pvm)
+	public void drawFlush(Matrix4f transformMatrix)
 	{
 		if (this.buffer.position() < FLOATS - 1)
 			return;
 		
 		this.shader.bind();
-		this.shader.setUniformMatrix4f("u_transform", pvm);
+		this.shader.setUniformMatrix4f("u_transform", transformMatrix);
 		
 		int drawCount = this.buffer.position() / FLOATS;
 		
