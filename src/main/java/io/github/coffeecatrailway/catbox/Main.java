@@ -58,7 +58,7 @@ public class Main
 		System.out.println("LWJGL: " + Version.getVersion());
 		System.out.println("ImGUI: " + ImGui.getVersion());
 		
-		this.window = new Window(800, 800);
+		this.window = new Window(1066, 600);
 		this.window.init("CatBox", true, GLFW_PLATFORM_X11); // Wrong, we're on wayland but anyway...
 		GLFWFramebufferSizeCallbackI callback = (window, width, height) -> {
 			float aspect = (float) width / (float) height;
