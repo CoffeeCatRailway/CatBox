@@ -6,6 +6,7 @@ import io.github.coffeecatrailway.catbox.boxes.ShapeCatBox;
 import io.github.coffeecatrailway.engine.renderer.ShapeRenderer;
 import io.github.coffeecatrailway.engine.renderer.window.ImGUIWrapper;
 import io.github.coffeecatrailway.engine.renderer.window.Window;
+import org.joml.Math;
 import org.joml.Matrix4f;
 import org.lwjgl.Version;
 import org.lwjgl.glfw.GLFWFramebufferSizeCallbackI;
@@ -20,6 +21,7 @@ public class Main
 	 * [O] Window/LWJGL
 	 * [O] ImGUI
 	 * [O] Renderer, queue system for basic shapes (Circle, Box, Line)
+	 * [X] Debug line renderer
 	 * [X] Physics engine:
 	 *    [X] Basic forces
 	 *    [X] Simple collision detection/response (Circle, Box, Line)
@@ -59,7 +61,7 @@ public class Main
 		System.out.println("LWJGL: " + Version.getVersion());
 		System.out.println("ImGUI: " + ImGui.getVersion());
 		
-		this.window = new Window(1066, 600);
+		this.window = new Window(Math.roundHalfDown(1600.f * .8f), Math.roundHalfDown(900.f * .8f));
 		this.window.init("CatBox", true, GLFW_PLATFORM_X11); // Wrong, we're on wayland but anyway...
 		GLFWFramebufferSizeCallbackI callback = (window, width, height) -> this.updatePVM((float) width / (float) height);
 		this.window.setFramebufferCallback(callback);
@@ -139,7 +141,9 @@ public class Main
 		if (ImGui.begin("Info"))
 		{
 			halfWidth = ImGui.getWindowWidth() * .5f;
-			ImGui.text(String.format("FPS: %f\nFrames: %d\nSteps Fixed: %d", ImGui.getIO().getFramerate(), this.frameCount, this.stepCount));
+			ImGui.text(String.format("FPS: %f\nFrames: %d\tSteps Fixed: %d", ImGui.getIO().getFramerate(), this.frameCount, this.stepCount));
+			ImGui.text(String.format("World view: %.1f", this.worldView));
+			ImGui.text(String.format("Window size: %d/%d", this.window.getWidth(), this.window.getHeight()));
 			if (ImGui.checkbox("Vsync", this.vSync))
 			{
 				this.vSync = !this.vSync;
