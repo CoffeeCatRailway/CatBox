@@ -3,7 +3,7 @@ package io.github.coffeecatrailway.catbox;
 import imgui.ImGui;
 import io.github.coffeecatrailway.catbox.boxes.CatBoxI;
 import io.github.coffeecatrailway.catbox.boxes.ShapeCatBox;
-import io.github.coffeecatrailway.engine.renderer.shapes.ShapeRenderer;
+import io.github.coffeecatrailway.engine.renderer.ShapeRenderer;
 import io.github.coffeecatrailway.engine.renderer.window.ImGUIWrapper;
 import io.github.coffeecatrailway.engine.renderer.window.Window;
 import org.joml.Matrix4f;

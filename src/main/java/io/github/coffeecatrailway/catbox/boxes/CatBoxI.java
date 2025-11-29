@@ -1,6 +1,6 @@
 package io.github.coffeecatrailway.catbox.boxes;
 
-import io.github.coffeecatrailway.engine.renderer.shapes.ShapeRenderer;
+import io.github.coffeecatrailway.engine.renderer.ShapeRenderer;
 
 public interface CatBoxI
 {

@@ -1,7 +1,7 @@
 package io.github.coffeecatrailway.catbox.boxes;
 
 import imgui.ImGui;
-import io.github.coffeecatrailway.engine.renderer.shapes.ShapeRenderer;
+import io.github.coffeecatrailway.engine.renderer.ShapeRenderer;
 import org.joml.Math;
 import org.joml.Vector2f;
 import org.joml.Vector3f;

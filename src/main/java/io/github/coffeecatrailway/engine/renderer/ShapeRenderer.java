@@ -1,6 +1,5 @@
-package io.github.coffeecatrailway.engine.renderer.shapes;
+package io.github.coffeecatrailway.engine.renderer;
 
-import io.github.coffeecatrailway.engine.renderer.Shader;
 import org.joml.Math;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
