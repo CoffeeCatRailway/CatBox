@@ -13,13 +13,11 @@ public class ShapeCatBox implements CatBoxI
 	@Override
 	public void init()
 	{
-	
 	}
 	
 	@Override
 	public void update(float deltaTime)
 	{
-	
 	}
 	
 	@Override

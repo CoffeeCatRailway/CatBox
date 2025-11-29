@@ -40,9 +40,9 @@ public class Main
 	
 	// Options
 	private boolean vSync = true, pauseFixed = true, btnStepFixed = false;
-	private float worldView = 100.f;
+	private final float worldView = 100.f;
 	
-	private float[] backgroundColor = {
+	private final float[] backgroundColor = {
 			// 0.f, 0.f, 0.f
 			95.f / 255.f,
 			68.f / 255.f,
@@ -53,7 +53,7 @@ public class Main
 	private int frameCount = 0, stepCount = 0;
 	private int ticksPerSecond = 60;
 	private float cycleTime = 1.f / (float) ticksPerSecond;
-	private Timer sysTimer = new Timer(), updateTimer = new Timer();
+	private final Timer sysTimer = new Timer(), updateTimer = new Timer();
 	
 	private void init()
 	{
