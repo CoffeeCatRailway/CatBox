@@ -65,13 +65,10 @@ void main()
 	
 	if (g_shapeId[0] != ID_CIRCLE)
 	{
-		vec2 origin = vec2(0.);
-//		if (g_shapeId[0] == ID_LINE)
-//			origin = vec2(0.);
-		bl.xy = rotate(origin, bl.xy, g_rotation[0]);
-		br.xy = rotate(origin, br.xy, g_rotation[0]);
-		tl.xy = rotate(origin, tl.xy, g_rotation[0]);
-		tr.xy = rotate(origin, tr.xy, g_rotation[0]);
+		bl.xy = rotate(vec2(0.), bl.xy, g_rotation[0]);
+		br.xy = rotate(vec2(0.), br.xy, g_rotation[0]);
+		tl.xy = rotate(vec2(0.), tl.xy, g_rotation[0]);
+		tr.xy = rotate(vec2(0.), tr.xy, g_rotation[0]);
 	}
 	
     vec4 center = gl_in[0].gl_Position;

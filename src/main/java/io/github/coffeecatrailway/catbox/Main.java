@@ -6,10 +6,7 @@ import io.github.coffeecatrailway.catbox.boxes.ShapeCatBox;
 import io.github.coffeecatrailway.engine.renderer.shapes.ShapeRenderer;
 import io.github.coffeecatrailway.engine.renderer.window.ImGUIWrapper;
 import io.github.coffeecatrailway.engine.renderer.window.Window;
-import org.joml.Math;
 import org.joml.Matrix4f;
-import org.joml.Vector2f;
-import org.joml.Vector3f;
 import org.lwjgl.Version;
 import org.lwjgl.glfw.GLFWFramebufferSizeCallbackI;
 
@@ -22,7 +19,7 @@ public class Main
 	 * Check List:
 	 * [O] Window/LWJGL
 	 * [O] ImGUI
-	 * [X] Renderer, queue system for basic shapes (Circle, Box, Line)
+	 * [O] Renderer, queue system for basic shapes (Circle, Box, Line)
 	 * [X] Physics engine:
 	 *    [X] Basic forces
 	 *    [X] Simple collision detection/response (Circle, Box, Line)
