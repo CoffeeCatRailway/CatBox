@@ -74,7 +74,7 @@ public class LineRenderer
 	private void checkSpace()
 	{
 		if (this.buffer.position() >= this.buffer.capacity() - 1)
-			this.buffer = MemoryUtil.memRealloc(this.buffer, this.buffer.capacity() + FLOATS);
+			this.buffer = MemoryUtil.memRealloc(this.buffer, this.buffer.capacity() + FLOATS * 2);
 	}
 	
 	public void pushLine(Vector2f pos1, Vector3f color1, Vector2f pos2, Vector3f color2)
@@ -98,7 +98,7 @@ public class LineRenderer
 	
 	public void drawFlush(Matrix4f transformMatrix)
 	{
-		if (this.buffer.position() < FLOATS - 1)
+		if (this.buffer.position() < (FLOATS * 2) - 1)
 			return;
 		
 		this.shader.bind();
