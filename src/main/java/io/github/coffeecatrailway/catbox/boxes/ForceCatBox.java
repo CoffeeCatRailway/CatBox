@@ -60,7 +60,7 @@ public class ForceCatBox implements CatBoxI
 	// Options
 	private final Vector2f forceGravity = new Vector2f(0.f, -98.1f);
 	private float nudgeDampener = .1f;
-	private int steps = 20;
+	private final int steps = 20;
 	
 	@Override
 	public void init(float worldView)
@@ -75,12 +75,12 @@ public class ForceCatBox implements CatBoxI
 		Random rand = new Random(0L);
 		
 		float f = worldView * .8f;
-		for (int i = 0; i < 100; i++)
+		for (int i = 0; i < 200; i++)
 		{
 			final float x = rand.nextFloat() * f * 2.f - f;
 			final float y = rand.nextFloat() * f * 2.f - f;
-			final float vx = rand.nextFloat() * 60.f - 30.f;
-			final float vy = rand.nextFloat() * 60.f - 30.f;
+			final float vx = rand.nextFloat() * 100.f - 50.f;
+			final float vy = rand.nextFloat() * 100.f - 50.f;
 			
 			final float r = rand.nextFloat();
 			final float g = rand.nextFloat();
