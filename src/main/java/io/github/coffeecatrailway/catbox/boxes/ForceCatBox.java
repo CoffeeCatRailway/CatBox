@@ -7,7 +7,9 @@ import io.github.coffeecatrailway.engine.physics.object.Particle;
 import io.github.coffeecatrailway.engine.renderer.LineRenderer;
 import io.github.coffeecatrailway.engine.renderer.ShapeRenderer;
 import org.joml.Math;
+import org.joml.Random;
 import org.joml.Vector2f;
+import org.joml.Vector3f;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,9 +47,11 @@ public class ForceCatBox implements CatBoxI
 	 * [O] Particle object (pos, vel, radius, etc)
 	 * [O] Gravity
 	 * [O] Line-Ball collision
-	 * [X] Ball-Ball collision
+	 * [O] Line thickness - why was this easy?
+	 * [O] Ball-Ball collision
 	 * [X] Hard constraint
 	 * [X] Soft constraint
+	 * [X] Abstract away collision to component system for 'physical constraints'
 	 */
 	
 	private final List<Particle> particles = new ArrayList<>();
@@ -56,15 +60,41 @@ public class ForceCatBox implements CatBoxI
 	// Options
 	private final Vector2f forceGravity = new Vector2f(0.f, -98.1f);
 	private float nudgeDampener = .1f;
+	private int steps = 20;
 	
 	@Override
 	public void init(float worldView)
 	{
-		Particle particle = new Particle(new Vector2f(0.f), 5.f);
-		particle.velocity.add(0.f, 100.f);
-		this.particles.add(particle);
+//		Particle prt1 = new Particle(new Vector2f(-10.f, 0.f), 5.f);
+//		prt1.velocity.add(100.f, 100.f);
+//		this.particles.add(prt1);
+//		Particle prt2 = new Particle(new Vector2f(10.f, 0.f), 5.f);
+//		prt2.velocity.add(-100.f, 100.f);
+//		this.particles.add(prt2);
 		
-		this.lines.add(new Line(new Vector2f(worldView * .9f, worldView * -.9f), new Vector2f(worldView * -.9f)));
+		Random rand = new Random(0L);
+		
+		float f = worldView * .8f;
+		for (int i = 0; i < 100; i++)
+		{
+			final float x = rand.nextFloat() * f * 2.f - f;
+			final float y = rand.nextFloat() * f * 2.f - f;
+			final float vx = rand.nextFloat() * 60.f - 30.f;
+			final float vy = rand.nextFloat() * 60.f - 30.f;
+			
+			final float r = rand.nextFloat();
+			final float g = rand.nextFloat();
+			final float b = rand.nextFloat();
+			
+			final float radius = rand.nextFloat() * 2.5f + 2.5f;
+			this.particles.add(new Particle(new Vector2f(x, y), new Vector2f(vx, vy), new Vector3f(r, g, b), radius, .003f, .9f));
+		}
+		
+		f = worldView * .9f;
+		this.lines.add(new Line(new Vector2f(-f), new Vector2f(f, -f), 0.f));
+		this.lines.add(new Line(new Vector2f(f, -f), new Vector2f(f), 2.5f));
+		this.lines.add(new Line(new Vector2f(f), new Vector2f(-f, f), 5.f));
+		this.lines.add(new Line(new Vector2f(-f, f), new Vector2f(-f), 10.f));
 	}
 	
 	@Override
@@ -76,59 +106,95 @@ public class ForceCatBox implements CatBoxI
 	@Override
 	public void fixedUpdate(float deltaTime)
 	{
-		for (int i = 0; i < this.particles.size(); i++)
+		deltaTime *= 1.f / (float) this.steps;
+		for (int i = 0; i < this.steps; i++)
 		{
-			Particle particle = this.particles.get(i);
-			particle.velocity.add(this.forceGravity.mul(deltaTime, new Vector2f()));
-			
-			for (Line line : this.lines)
+			for (int j = 0; j < this.particles.size(); j++)
 			{
-				// Get particle position local to line
-				Vector2f local = particle.position.sub(line.p1, new Vector2f());
-				final float distAlongLine = local.dot(line.getTangent());
+				Particle prt1 = this.particles.get(j);
+				prt1.velocity.add(this.forceGravity.mul(deltaTime, new Vector2f()));
 				
-				// Default to along the line
-				Vector2f normal = line.getNormal();
-				float distAwayFromLine = local.dot(normal);
-				if (distAwayFromLine < 0.f)
-					normal.negate();
-				distAwayFromLine = Math.abs(distAwayFromLine);
-				
-				// Check if ball is colliding with line end
-				if (distAlongLine < 0.f || distAlongLine > line.getLength())
+				for (int k = j + 1; k < this.particles.size(); k++)
 				{
-					// Check what end the particle is at
-					if (distAlongLine > 0.f)
+					Particle prt2 = this.particles.get(k);
+					Vector2f normal = prt2.position.sub(prt1.position, new Vector2f());
+					final float dist = normal.length();
+					normal.normalize();
+					if (dist < prt1.radius + prt2.radius)
 					{
-						particle.position.sub(line.p2, local);
-						local.normalize(normal);
-					} else
-						particle.position.sub(line.p1, normal).normalize();
-					distAwayFromLine = Math.abs(local.dot(normal));
+						// Nudge particle back to correct spots
+						final Vector2f nudge = normal.mul((dist - (prt1.radius + prt2.radius)) * .5f, new Vector2f()).mul(this.nudgeDampener);
+						prt1.position.add(nudge);
+						prt2.position.sub(nudge);
+						
+						Vector2f relVelocity = prt2.velocity.sub(prt1.velocity, new Vector2f());
+						final float relSpeedAlongNormal = relVelocity.dot(normal);
+						final float relSpeedAlongTangent = relVelocity.dot(new Vector2f(normal).perpendicular());
+						
+						// Sliding friction TODO: friction and restitution of both particles
+						Vector2f force = new Vector2f();
+						force.x = relSpeedAlongTangent * .5f * normal.y * ((prt1.friction + prt2.friction) * .5f);
+						force.y = relSpeedAlongTangent * .5f * -normal.x * ((prt1.friction + prt2.friction) * .5f);
+						
+						// Elastic collision
+						force.add(normal.mul(relSpeedAlongNormal * ((prt1.restitution + prt2.restitution) * .5f), new Vector2f()));
+						// Inelastic collision
+						force.add(normal.mul(relSpeedAlongNormal * .5f * (1.f - (prt1.restitution + prt2.restitution) * .5f), new Vector2f()));
+						
+						prt1.velocity.add(force);
+						prt2.velocity.sub(force);
+					}
 				}
 				
-				if (distAwayFromLine < particle.radius)
+				for (Line line : this.lines)
 				{
-					// Nudge particle back to correct spot
-					final Vector2f nudge = normal.mul((distAwayFromLine - (particle.radius + 1.f)) * .5f, new Vector2f());
-					particle.position.sub(nudge.mul(this.nudgeDampener));
+					// Get particle position local to line
+					Vector2f local = prt1.position.sub(line.p1, new Vector2f());
+					final float distAlongLine = local.dot(line.getTangent());
 					
-					// Calculate new velocity
-					final float speedAlongNormal = particle.velocity.dot(normal);
-					final float speedAlongTangent = particle.velocity.dot(new Vector2f(normal).perpendicular());
-					if (speedAlongNormal <= 0.f)
+					// Default to along the line
+					Vector2f normal = line.getNormal();
+					float distAwayFromLine = local.dot(normal);
+					if (distAwayFromLine < 0.f)
+						normal.negate();
+					distAwayFromLine = Math.abs(distAwayFromLine);
+					
+					// Check if ball is colliding with line end
+					if (distAlongLine < 0.f || distAlongLine > line.getLength())
 					{
-						particle.velocity.x = -(speedAlongNormal * normal.x) * particle.restitution
-								+ speedAlongTangent * normal.y * (1.f - particle.friction);
-						particle.velocity.y = -(speedAlongNormal * normal.y) * particle.restitution
-								+ speedAlongTangent * -normal.x * (1.f - particle.friction);
+						// Check what end the particle is at
+						if (distAlongLine > 0.f)
+						{
+							prt1.position.sub(line.p2, local);
+							local.normalize(normal);
+						} else
+							prt1.position.sub(line.p1, normal).normalize();
+						distAwayFromLine = Math.abs(local.dot(normal));
+					}
+					
+					if (distAwayFromLine < line.thickness * .5f + prt1.radius)
+					{
+						// Nudge particle back to correct spot
+						final Vector2f nudge = normal.mul((distAwayFromLine - (prt1.radius + line.thickness * .5f)) * .5f, new Vector2f()).mul(this.nudgeDampener);
+						prt1.position.sub(nudge);
+						
+						// Calculate new velocity
+						final float speedAlongNormal = prt1.velocity.dot(normal);
+						final float speedAlongTangent = prt1.velocity.dot(new Vector2f(normal).perpendicular());
+						if (speedAlongNormal <= 0.f)
+						{
+							prt1.velocity.x = -(speedAlongNormal * normal.x) * prt1.restitution
+									+ speedAlongTangent * normal.y * (1.f - prt1.friction);
+							prt1.velocity.y = -(speedAlongNormal * normal.y) * prt1.restitution
+									+ speedAlongTangent * -normal.x * (1.f - prt1.friction);
+						}
 					}
 				}
 			}
+			
+			for (Particle particle : this.particles)
+				particle.position.add(particle.velocity.mul(deltaTime, new Vector2f()));
 		}
-		
-		for (Particle particle : this.particles)
-			particle.position.add(particle.velocity.mul(deltaTime, new Vector2f()));
 	}
 	
 	@Override
@@ -150,7 +216,10 @@ public class ForceCatBox implements CatBoxI
 	public void gui(float halfWidth)
 	{
 		ImGui.text(String.format("Particles: %d", this.particles.size()));
+		ImGui.text(String.format("Physics steps: %d", this.steps));
+		ImGui.separator();
 		
+		ImGui.pushItemWidth(halfWidth * 1.5f);
 		ImGui.text("Gravity:");
 		float[] gravity = new float[] {this.forceGravity.x, this.forceGravity.y};
 		if (ImGui.inputFloat2("##gravity", gravity, "%.2f"))
@@ -163,5 +232,7 @@ public class ForceCatBox implements CatBoxI
 		ImFloat dampener = new ImFloat(this.nudgeDampener);
 		if (ImGui.inputFloat("##nudgeDampener", dampener, .05f, .1f, "%.2f"))
 			this.nudgeDampener = Math.abs(dampener.get());
+		
+		ImGui.popItemWidth();
 	}
 }
