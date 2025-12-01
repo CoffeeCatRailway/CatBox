@@ -2,6 +2,7 @@ package io.github.coffeecatrailway.catbox;
 
 import imgui.ImGui;
 import io.github.coffeecatrailway.catbox.boxes.CatBoxI;
+import io.github.coffeecatrailway.catbox.boxes.ForceCatBox;
 import io.github.coffeecatrailway.catbox.boxes.ShapeCatBox;
 import io.github.coffeecatrailway.engine.renderer.LineRenderer;
 import io.github.coffeecatrailway.engine.renderer.ShapeRenderer;
@@ -77,8 +78,9 @@ public class Main
 		this.lineRenderer = new LineRenderer(10);
 		this.lineRenderer.init();
 		
-		this.catBox = new ShapeCatBox();
-		this.catBox.init();
+//		this.catBox = new ShapeCatBox();
+		this.catBox = new ForceCatBox();
+		this.catBox.init(this.worldView);
 	}
 	
 	private void updateTransform(float aspect)

@@ -5,7 +5,7 @@ import io.github.coffeecatrailway.engine.renderer.ShapeRenderer;
 
 public interface CatBoxI
 {
-	void init();
+	void init(float worldView);
 	
 	void update(float deltaTime);
 	void fixedUpdate(float deltaTime);

@@ -13,7 +13,7 @@ public class ShapeCatBox implements CatBoxI
 	private boolean showBoxes = true;
 	
 	@Override
-	public void init()
+	public void init(float worldView)
 	{
 	}
 	
