@@ -90,7 +90,7 @@ public class ForceCatBox implements CatBoxI
 			final float g = rand.nextFloat();
 			final float b = rand.nextFloat();
 			
-			final float radius = rand.nextFloat() * 2.5f + 2.5f;
+			final float radius = (rand.nextFloat() * .6f + .4f) * 5.f;
 			this.particles.add(new Particle(new Vector2f(x, y), new Vector2f(vx, vy), new Vector3f(r, g, b), radius, .003f, .9f));
 		}
 		
