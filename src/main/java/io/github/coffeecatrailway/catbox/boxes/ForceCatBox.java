@@ -2,6 +2,8 @@ package io.github.coffeecatrailway.catbox.boxes;
 
 import imgui.ImGui;
 import imgui.type.ImFloat;
+import io.github.coffeecatrailway.engine.physics.constraint.Constraint;
+import io.github.coffeecatrailway.engine.physics.constraint.SpringConstraint;
 import io.github.coffeecatrailway.engine.physics.object.Line;
 import io.github.coffeecatrailway.engine.physics.object.Particle;
 import io.github.coffeecatrailway.engine.renderer.LineRenderer;
@@ -56,6 +58,7 @@ public class ForceCatBox implements CatBoxI
 	
 	private final List<Particle> particles = new ArrayList<>();
 	private final List<Line> lines = new ArrayList<>();
+	private final List<Constraint> constraints = new ArrayList<>();
 	
 	// Options
 	private final Vector2f forceGravity = new Vector2f(0.f, -98.1f);
@@ -75,7 +78,7 @@ public class ForceCatBox implements CatBoxI
 		Random rand = new Random(0L);
 		
 		float f = worldView * .8f;
-		for (int i = 0; i < 200; i++)
+		for (int i = 0; i < 2; i++)
 		{
 			final float x = rand.nextFloat() * f * 2.f - f;
 			final float y = rand.nextFloat() * f * 2.f - f;
@@ -90,11 +93,17 @@ public class ForceCatBox implements CatBoxI
 			this.particles.add(new Particle(new Vector2f(x, y), new Vector2f(vx, vy), new Vector3f(r, g, b), radius, .003f, .9f));
 		}
 		
+//		this.lines.add(new Line(this.particles.get(0).position, this.particles.get(1).position));
+		
 		f = worldView * .9f;
 		this.lines.add(new Line(new Vector2f(-f), new Vector2f(f, -f), 0.f));
 		this.lines.add(new Line(new Vector2f(f, -f), new Vector2f(f), 2.5f));
 		this.lines.add(new Line(new Vector2f(f), new Vector2f(-f, f), 5.f));
 		this.lines.add(new Line(new Vector2f(-f, f), new Vector2f(-f), 10.f));
+		
+		this.constraints.add(new SpringConstraint(this.particles.get(0), this.particles.get(1), 40.f, 100.f, 2.f));
+//		this.constraints.add(new SpringConstraint(this.particles.get(1), this.particles.get(2), 40.f, 100.f, 10.f));
+//		this.constraints.add(new SpringConstraint(this.particles.get(2), this.particles.get(0), 40.f, 100.f, 10.f));
 	}
 	
 	@Override
@@ -192,6 +201,9 @@ public class ForceCatBox implements CatBoxI
 				}
 			}
 			
+			for (Constraint constraint : this.constraints)
+				constraint.update(deltaTime);
+			
 			for (Particle particle : this.particles)
 				particle.position.add(particle.velocity.mul(deltaTime, new Vector2f()));
 		}
@@ -200,6 +212,8 @@ public class ForceCatBox implements CatBoxI
 	@Override
 	public void render(ShapeRenderer shapeRenderer, LineRenderer lineRenderer)
 	{
+		for (Constraint constraint : this.constraints)
+			constraint.render(shapeRenderer, lineRenderer);
 		for (Line line : this.lines)
 			line.render(shapeRenderer, lineRenderer);
 		for (Particle particle : this.particles)
