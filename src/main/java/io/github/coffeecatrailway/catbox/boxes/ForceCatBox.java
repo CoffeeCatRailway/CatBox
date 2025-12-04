@@ -78,30 +78,31 @@ public class ForceCatBox implements CatBoxI
 		Random rand = new Random(0L);
 		
 		float f = worldView * .8f;
-		for (int i = 0; i < 2; i++)
+		for (int i = 0; i < 200; i++)
 		{
 			final float x = rand.nextFloat() * f * 2.f - f;
 			final float y = rand.nextFloat() * f * 2.f - f;
-			final float vx = rand.nextFloat() * 100.f - 50.f;
-			final float vy = rand.nextFloat() * 100.f - 50.f;
+			final float v = 200.f;
+			final float vx = rand.nextFloat() * v - v * .5f;
+			final float vy = rand.nextFloat() * v - v * .5f;
 			
 			final float r = rand.nextFloat();
 			final float g = rand.nextFloat();
 			final float b = rand.nextFloat();
 			
 			final float radius = rand.nextFloat() * 2.5f + 2.5f;
-			this.particles.add(new Particle(new Vector2f(x, y), new Vector2f(vx, vy), new Vector3f(r, g, b), radius, .003f, .9f));
+			this.particles.add(new Particle(new Vector2f(x, y), new Vector2f(vx, vy), new Vector3f(r, g, b), radius, .003f, 1.f));
 		}
 		
 //		this.lines.add(new Line(this.particles.get(0).position, this.particles.get(1).position));
 		
 		f = worldView * .9f;
-		this.lines.add(new Line(new Vector2f(-f), new Vector2f(f, -f), 0.f));
+		this.lines.add(new Line(new Vector2f(-f), new Vector2f(f, -f), 1.25f));
 		this.lines.add(new Line(new Vector2f(f, -f), new Vector2f(f), 2.5f));
-		this.lines.add(new Line(new Vector2f(f), new Vector2f(-f, f), 5.f));
-		this.lines.add(new Line(new Vector2f(-f, f), new Vector2f(-f), 10.f));
+		this.lines.add(new Line(new Vector2f(f), new Vector2f(-f, f), 3.75f));
+		this.lines.add(new Line(new Vector2f(-f, f), new Vector2f(-f), 5.f));
 		
-		this.constraints.add(new SpringConstraint(this.particles.get(0), this.particles.get(1), 40.f, 100.f, 2.f));
+//		this.constraints.add(new SpringConstraint(this.particles.get(0), this.particles.get(1), 40.f, 100.f, 2.f));
 //		this.constraints.add(new SpringConstraint(this.particles.get(1), this.particles.get(2), 40.f, 100.f, 10.f));
 //		this.constraints.add(new SpringConstraint(this.particles.get(2), this.particles.get(0), 40.f, 100.f, 10.f));
 	}
@@ -115,14 +116,26 @@ public class ForceCatBox implements CatBoxI
 	@Override
 	public void fixedUpdate(float deltaTime)
 	{
-		deltaTime *= 1.f / (float) this.steps;
+		// Velocity intergration
+		for (Particle particle : this.particles)
+		{
+			particle.velocity.x += this.forceGravity.x * deltaTime;
+			particle.velocity.y += this.forceGravity.y * deltaTime;
+//		}
+//
+//		for (Particle particle : this.particles)
+//		{
+			particle.position.x += particle.velocity.x * deltaTime;
+			particle.position.y += particle.velocity.y * deltaTime;
+		}
+		
+		// Collision resolution
+		float deltaTimeStep = deltaTime * (1.f / (float) this.steps);
 		for (int i = 0; i < this.steps; i++)
 		{
 			for (int j = 0; j < this.particles.size(); j++)
 			{
 				Particle prt1 = this.particles.get(j);
-				prt1.velocity.add(this.forceGravity.mul(deltaTime, new Vector2f()));
-				
 				for (int k = j + 1; k < this.particles.size(); k++)
 				{
 					Particle prt2 = this.particles.get(k);
@@ -135,39 +148,39 @@ public class ForceCatBox implements CatBoxI
 						final Vector2f nudge = normal.mul((dist - (prt1.radius + prt2.radius)) * .5f, new Vector2f()).mul(this.nudgeDampener);
 						prt1.position.add(nudge);
 						prt2.position.sub(nudge);
-						
+
 						Vector2f relVelocity = prt2.velocity.sub(prt1.velocity, new Vector2f());
 						final float relSpeedAlongNormal = relVelocity.dot(normal);
 						final float relSpeedAlongTangent = relVelocity.dot(new Vector2f(normal).perpendicular());
-						
+
 						// Sliding friction TODO: friction and restitution of both particles
 						Vector2f force = new Vector2f();
 						force.x = relSpeedAlongTangent * .5f * normal.y * ((prt1.friction + prt2.friction) * .5f);
 						force.y = relSpeedAlongTangent * .5f * -normal.x * ((prt1.friction + prt2.friction) * .5f);
-						
+
 						// Elastic collision
 						force.add(normal.mul(relSpeedAlongNormal * ((prt1.restitution + prt2.restitution) * .5f), new Vector2f()));
 						// Inelastic collision
 						force.add(normal.mul(relSpeedAlongNormal * .5f * (1.f - (prt1.restitution + prt2.restitution) * .5f), new Vector2f()));
-						
+
 						prt1.velocity.add(force);
 						prt2.velocity.sub(force);
 					}
 				}
-				
+
 				for (Line line : this.lines)
 				{
 					// Get particle position local to line
 					Vector2f local = prt1.position.sub(line.p1, new Vector2f());
 					final float distAlongLine = local.dot(line.getTangent());
-					
+
 					// Default to along the line
 					Vector2f normal = line.getNormal();
 					float distAwayFromLine = local.dot(normal);
 					if (distAwayFromLine < 0.f)
 						normal.negate();
 					distAwayFromLine = Math.abs(distAwayFromLine);
-					
+
 					// Check if ball is colliding with line end
 					if (distAlongLine < 0.f || distAlongLine > line.getLength())
 					{
@@ -180,13 +193,13 @@ public class ForceCatBox implements CatBoxI
 							prt1.position.sub(line.p1, normal).normalize();
 						distAwayFromLine = Math.abs(local.dot(normal));
 					}
-					
+
 					if (distAwayFromLine < line.thickness * .5f + prt1.radius)
 					{
 						// Nudge particle back to correct spot
 						final Vector2f nudge = normal.mul((distAwayFromLine - (prt1.radius + line.thickness * .5f)) * .5f, new Vector2f()).mul(this.nudgeDampener);
 						prt1.position.sub(nudge);
-						
+
 						// Calculate new velocity
 						final float speedAlongNormal = prt1.velocity.dot(normal);
 						final float speedAlongTangent = prt1.velocity.dot(new Vector2f(normal).perpendicular());
@@ -200,13 +213,10 @@ public class ForceCatBox implements CatBoxI
 					}
 				}
 			}
-			
-			for (Constraint constraint : this.constraints)
-				constraint.update(deltaTime);
-			
-			for (Particle particle : this.particles)
-				particle.position.add(particle.velocity.mul(deltaTime, new Vector2f()));
 		}
+		
+//		for (Constraint constraint : this.constraints)
+//			constraint.update(deltaTime);
 	}
 	
 	@Override
@@ -214,8 +224,10 @@ public class ForceCatBox implements CatBoxI
 	{
 		for (Constraint constraint : this.constraints)
 			constraint.render(shapeRenderer, lineRenderer);
+		
 		for (Line line : this.lines)
 			line.render(shapeRenderer, lineRenderer);
+		
 		for (Particle particle : this.particles)
 			particle.render(shapeRenderer, lineRenderer);
 	}
