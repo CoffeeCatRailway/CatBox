@@ -91,7 +91,7 @@ public class ForceCatBox implements CatBoxI
 			final float b = rand.nextFloat();
 			
 			final float radius = rand.nextFloat() * 2.5f + 2.5f;
-			this.particles.add(new Particle(new Vector2f(x, y), new Vector2f(vx, vy), new Vector3f(r, g, b), radius, .003f, 1.f));
+			this.particles.add(new Particle(new Vector2f(x, y), new Vector2f(vx, vy), new Vector3f(r, g, b), radius, .003f, .9f));
 		}
 		
 //		this.lines.add(new Line(this.particles.get(0).position, this.particles.get(1).position));
@@ -113,9 +113,14 @@ public class ForceCatBox implements CatBoxI
 	
 	}
 	
+//	float r = 0.f;
 	@Override
 	public void fixedUpdate(float deltaTime)
 	{
+//		r += .25f * deltaTime;
+//		forceGravity.x = Math.cos(r) * 98.1f;
+//		forceGravity.y = Math.sin(r) * 98.1f;
+		
 		// Velocity intergration
 		for (Particle particle : this.particles)
 		{
@@ -130,7 +135,7 @@ public class ForceCatBox implements CatBoxI
 		}
 		
 		// Collision resolution
-		float deltaTimeStep = deltaTime * (1.f / (float) this.steps);
+		float deltaTimeStep = deltaTime * (float) this.steps;
 		for (int i = 0; i < this.steps; i++)
 		{
 			for (int j = 0; j < this.particles.size(); j++)
