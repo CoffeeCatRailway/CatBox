@@ -11,14 +11,9 @@ public class SpringConstraint implements Constraint
 	public Particle p1, p2;
 	public float length, force, damping;
 	
-	public SpringConstraint(Particle p1, Particle p2, float force)
+	public SpringConstraint(Particle p1, Particle p2, float force, float damping)
 	{
-		this(p1, p2, p1.position.distance(p2.position), force);
-	}
-	
-	public SpringConstraint(Particle p1, Particle p2, float length, float force)
-	{
-		this(p1, p2, length, force, 2.f);
+		this(p1, p2, p1.position.distance(p2.position), force, damping);
 	}
 	
 	public SpringConstraint(Particle p1, Particle p2, float length, float force, float damping)
@@ -33,32 +28,34 @@ public class SpringConstraint implements Constraint
 	@Override
 	public void update(float deltaTime)
 	{
-//		Vector2f force = this.p2.position.sub(this.p1.position, new Vector2f());
-//		final float forceFactor = (this.length - force.length()) * this.force;
-//		force.normalize().mul(forceFactor);
-//
-//		Vector2f relVelocity = this.p1.velocity.sub(this.p1.velocity, new Vector2f()).mul(this.damping);
-//		force.sub(relVelocity).mul(deltaTime);
-//
-//		this.p1.velocity.sub(force);
-//		this.p2.velocity.add(force);
-		
+		// F = -kx
+		// k = spring force, x = displacement
 		Vector2f delta = this.p2.position.sub(this.p1.position, new Vector2f());
 		Vector2f dir = delta.normalize(new Vector2f());
 
 		Vector2f reqDelta = dir.mul(this.length, new Vector2f());
 		Vector2f force = reqDelta.sub(delta, new Vector2f()).mul(this.force * deltaTime);
+		
+		// Damping
+		// Hacky, but anything I try makes it unstable
+		force.mul((float) Math.exp(-this.damping * deltaTime));
 
 		this.p1.velocity.sub(force);
 		this.p2.velocity.add(force);
 
-		float relVelocity = this.p2.velocity.sub(this.p1.velocity, new Vector2f()).dot(dir);
-		float dampingFactor = (float) Math.exp(-this.damping * deltaTime);
-		float newRelVelocity = relVelocity * dampingFactor;
-		float relVelocityDelta = (newRelVelocity - relVelocity) * .5f;
+//		float velDelta = this.p2.velocity.sub(this.p1.velocity, new Vector2f()).dot(dir);
+//		float velDeltaDamp = velDelta * (float) Math.exp(-this.damping * deltaTime);
+//		float dampForce = (velDeltaDamp - velDelta) * .5f;
+//
+//		this.p1.velocity.sub(dampForce, dampForce);
+//		this.p2.velocity.add(dampForce, dampForce);
 
-		this.p1.velocity.sub(relVelocityDelta, relVelocityDelta);
-		this.p2.velocity.add(relVelocityDelta, relVelocityDelta);
+//		Vector2f velDelta = this.p2.velocity.sub(this.p1.velocity, new Vector2f());
+//		Vector2f velDeltaDamp = velDelta.mul((float) Math.exp(-this.damping * deltaTime), new Vector2f());
+//		velDeltaDamp.sub(velDelta).mul(.5f);
+//
+//		this.p1.velocity.sub(velDeltaDamp);
+//		this.p2.velocity.add(velDeltaDamp);
 	}
 	
 	@Override

@@ -2,6 +2,7 @@ package io.github.coffeecatrailway.catbox;
 
 import imgui.ImGui;
 import io.github.coffeecatrailway.catbox.boxes.CatBoxI;
+import io.github.coffeecatrailway.catbox.boxes.Force2CatBox;
 import io.github.coffeecatrailway.catbox.boxes.ForceCatBox;
 import io.github.coffeecatrailway.catbox.boxes.ShapeCatBox;
 import io.github.coffeecatrailway.engine.renderer.LineRenderer;
@@ -79,7 +80,8 @@ public class Main
 		this.lineRenderer.init();
 		
 //		this.catBox = new ShapeCatBox();
-		this.catBox = new ForceCatBox();
+//		this.catBox = new ForceCatBox();
+		this.catBox = new Force2CatBox();
 		this.catBox.init(this.worldView);
 	}
 	
