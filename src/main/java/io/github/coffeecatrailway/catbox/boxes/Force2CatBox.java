@@ -177,8 +177,8 @@ public class Force2CatBox implements CatBoxI
 					// Inelastic collision
 					force.add(normal.mul(relSpeedAlongNormal * .5f * (1.f - this.elasticity), new Vector2f()));
 					
-//					final float massRatio1 = particle1.radius / particle2.radius;
-//					final float massRatio2 = particle2.radius / particle1.radius;
+//					final float massRatio1 = particle1.radius / (particle1.radius + particle2.radius);
+//					final float massRatio2 = particle2.radius / (particle1.radius + particle2.radius);
 //
 //					particle1.velocity.add(force.mul(massRatio2, new Vector2f()));
 //					particle2.velocity.sub(force.mul(massRatio1, new Vector2f()));
