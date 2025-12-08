@@ -1,16 +1,15 @@
 package io.github.coffeecatrailway.catbox;
 
 import imgui.ImGui;
-import io.github.coffeecatrailway.catbox.boxes.CatBoxI;
-import io.github.coffeecatrailway.catbox.boxes.Force2CatBox;
-import io.github.coffeecatrailway.catbox.boxes.ForceCatBox;
-import io.github.coffeecatrailway.catbox.boxes.ShapeCatBox;
+import io.github.coffeecatrailway.engine.physics.Solver;
+import io.github.coffeecatrailway.engine.physics.object.Particle;
 import io.github.coffeecatrailway.engine.renderer.LineRenderer;
 import io.github.coffeecatrailway.engine.renderer.ShapeRenderer;
 import io.github.coffeecatrailway.engine.renderer.window.ImGUIWrapper;
 import io.github.coffeecatrailway.engine.renderer.window.Window;
 import org.joml.Math;
 import org.joml.Matrix4f;
+import org.joml.Vector2f;
 import org.lwjgl.Version;
 import org.lwjgl.glfw.GLFWFramebufferSizeCallbackI;
 
@@ -40,7 +39,7 @@ public class Main
 	private ShapeRenderer shapeRenderer;
 	private LineRenderer lineRenderer;
 	
-	private CatBoxI catBox;
+	private Solver solver;
 	
 	// Options
 	private boolean vSync = true, pauseFixed = true, btnStepFixed = false;
@@ -54,7 +53,7 @@ public class Main
 	};
 	
 	// Timing
-	private int frameCount = 0, stepCount = 0;
+	private int frameCount = 0, fixedFrameCount = 0;
 	private int ticksPerSecond = 60;
 	private float cycleTime = 1.f / (float) ticksPerSecond;
 	private final Timer sysTimer = new Timer(), updateTimer = new Timer();
@@ -79,10 +78,10 @@ public class Main
 		this.lineRenderer = new LineRenderer(10);
 		this.lineRenderer.init();
 		
-//		this.catBox = new ShapeCatBox();
-//		this.catBox = new ForceCatBox();
-		this.catBox = new Force2CatBox();
-		this.catBox.init(this.worldView);
+		this.solver = new Solver();
+		this.solver.setConstraint(new Vector2f(0.f), this.worldView);
+		this.solver.setSubSteps(8);
+		this.solver.setTps(this.ticksPerSecond);
 	}
 	
 	private void updateTransform(float aspect)
@@ -110,7 +109,7 @@ public class Main
 			accumulatedSeconds += this.sysTimer.getElapsedSeconds();
 			
 			// update
-			this.catBox.update(this.sysTimer.getElapsedSeconds());
+			this.update(this.sysTimer.getElapsedSeconds());
 			
 			if (accumulatedSeconds > this.cycleTime)
 			{
@@ -118,8 +117,8 @@ public class Main
 				this.updateTimer.tick();
 				if (!this.pauseFixed || this.btnStepFixed)
 				{
-					this.catBox.fixedUpdate(this.updateTimer.getElapsedSeconds());
-					this.stepCount++;
+					this.fixedUpdate(this.updateTimer.getElapsedSeconds());
+					this.fixedFrameCount++;
 					this.btnStepFixed = false;
 				}
 			}
@@ -131,12 +130,7 @@ public class Main
 			glClearColor(this.backgroundColor[0], this.backgroundColor[1], this.backgroundColor[2], 1.f);
 			glClear(GL_COLOR_BUFFER_BIT);
 			
-			this.catBox.render(this.shapeRenderer, this.lineRenderer);
-			
-			this.shapeRenderer.drawFlush(this.transformMatrix);
-			this.lineRenderer.drawFlush(this.transformMatrix);
-			this.imgui.render();
-			
+			this.render();
 			this.frameCount++;
 			
 			// Swap buffer & poll events
@@ -145,13 +139,39 @@ public class Main
 		}
 	}
 	
+	private void update(float dt)
+	{
+	
+	}
+	
+	private void fixedUpdate(float dt)
+	{
+		if (this.solver.getObjectCount() < 2000 && (this.fixedFrameCount % 8) == 0)
+		{
+			Particle particle = new Particle(new Vector2f(0.f, this.worldView * .75f), 2.f);
+			this.solver.addParticle(particle);
+			this.solver.setParticleVelocity(particle, new Vector2f(100.f, 0.f));
+		}
+		
+		this.solver.update(dt);
+	}
+	
+	private void render()
+	{
+		this.solver.render(this.shapeRenderer, this.lineRenderer);
+		
+		this.shapeRenderer.drawFlush(this.transformMatrix);
+		this.lineRenderer.drawFlush(this.transformMatrix);
+		this.imgui.render();
+	}
+	
 	private void gui()
 	{
-		float halfWidth;
+		float windowWidth;
 		if (ImGui.begin("Info"))
 		{
-			halfWidth = ImGui.getWindowWidth() * .5f;
-			ImGui.text(String.format("FPS: %f\nFrames: %d\tSteps Fixed: %d", ImGui.getIO().getFramerate(), this.frameCount, this.stepCount));
+			windowWidth = ImGui.getWindowWidth();
+			ImGui.text(String.format("FPS: %f\nFrames: %d\tFixed Frames: %d", ImGui.getIO().getFramerate(), this.frameCount, this.fixedFrameCount));
 			ImGui.text(String.format("World view: %.1f", this.worldView));
 			ImGui.text(String.format("Window size: %d/%d", this.window.getWidth(), this.window.getHeight()));
 			if (ImGui.checkbox("Vsync", this.vSync))
@@ -172,12 +192,13 @@ public class Main
 			ImGui.text(String.format("Delta time: %fs", this.sysTimer.getElapsedSeconds()));
 			ImGui.text(String.format("Fixed delta time: %fs", this.updateTimer.getElapsedSeconds()));
 			
-			ImGui.pushItemWidth(halfWidth);
+			ImGui.pushItemWidth(windowWidth * .5f);
 			int[] vi = {this.ticksPerSecond};
 			if (ImGui.dragInt("Ticks Per Second", vi, 10, 10, 100, "%d"))
 			{
 				this.ticksPerSecond = vi[0];
 				this.cycleTime = 1.f / (float) this.ticksPerSecond;
+				this.solver.setTps(this.ticksPerSecond);
 			}
 			ImGui.text(String.format("Cycle time (1/tps): %fs", this.cycleTime));
 			ImGui.popItemWidth();
@@ -189,8 +210,8 @@ public class Main
 		
 		if (ImGui.begin("Simulation"))
 		{
-			halfWidth = ImGui.getWindowWidth() * .5f;
-			this.catBox.gui(halfWidth);
+			windowWidth = ImGui.getWindowWidth();
+			this.solver.gui(windowWidth);
 		}
 		ImGui.end();
 	}
@@ -198,7 +219,7 @@ public class Main
 	private void destroy()
 	{
 		System.out.println("Cleaning up");
-		this.catBox.destroy();
+		this.solver.destroy();
 		this.lineRenderer.destroy();
 		this.shapeRenderer.destroy();
 		this.imgui.destroy();
