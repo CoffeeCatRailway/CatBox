@@ -130,7 +130,7 @@ public class Solver
 		shapeRenderer.pushCircle(this.constraintCenter, new Vector3f(0.075f), this.constraintRadius, 0.f);
 		
 		for (VerletObject verletObject : this.objects)
-			verletObject.render(shapeRenderer, lineRenderer);
+			verletObject.render(this.frameDt, shapeRenderer, lineRenderer);
 	}
 	
 	public void destroy()

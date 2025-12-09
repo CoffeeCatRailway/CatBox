@@ -55,14 +55,15 @@ public class VerletObject
 		return this.posCurrent.sub(this.posLast, new Vector2f()).div(dt);
 	}
 	
-	public void render(ShapeRenderer shapeRenderer, LineRenderer lineRenderer)
+	public void render(float dt, ShapeRenderer shapeRenderer, LineRenderer lineRenderer)
 	{
 		shapeRenderer.pushCircle(this.posCurrent, this.color, this.radius, .1f);
 		
-//		if (this.velocity.length() > 10.f)
+//		Vector2f velocity = this.getVelocity(dt);
+//		if (velocity.length() > 10.f)
 //		{
-//			Vector3f color = this.color.negate(new Vector3f());
-//			Vector2f p2 = new Vector2f(this.posCurrent).add(new Vector2f(this.velocity).mul(.1f));
+//			Vector3f color = new Vector3f(1.f).sub(this.color);
+//			Vector2f p2 = new Vector2f(this.posCurrent).add(velocity.mul(.5f));
 //			lineRenderer.pushLine(this.posCurrent, color, p2, color);
 //		}
 	}
