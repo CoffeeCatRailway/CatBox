@@ -3,7 +3,7 @@ package io.github.coffeecatrailway.catbox;
 import org.joml.Random;
 import org.joml.Vector2f;
 
-public class RandUtil
+public final class RandUtil
 {
 	public static final Random RAND = new Random(0L);
 	
