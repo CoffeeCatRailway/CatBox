@@ -7,20 +7,20 @@ import org.joml.Vector3f;
 
 public class VerletObject
 {
-	public Vector2f posCurrent, posLast, acceleration;
+	public Vector2f position, positionLast, acceleration;
 	public Vector3f color;
 	public float radius, friction, elasticity;
 	public boolean fixed = false;
 	
-	public VerletObject(Vector2f posCurrent, float radius)
+	public VerletObject(Vector2f position, float radius)
 	{
-		this(posCurrent, new Vector3f(1.f), radius, 0.f, 1.f);
+		this(position, new Vector3f(1.f), radius, 0.f, 1.f);
 	}
 	
-	public VerletObject(Vector2f posCurrent, Vector3f color, float radius, float friction, float elasticity)
+	public VerletObject(Vector2f position, Vector3f color, float radius, float friction, float elasticity)
 	{
-		this.posCurrent = posCurrent;
-		this.posLast = new Vector2f(posCurrent);
+		this.position = position;
+		this.positionLast = new Vector2f(position);
 		this.acceleration = new Vector2f(0.f);
 		this.color = color;
 		this.radius = radius;
@@ -32,9 +32,9 @@ public class VerletObject
 	{
 		if (this.fixed)
 			return;
-		Vector2f displacement = this.posCurrent.sub(this.posLast, new Vector2f());
-		this.posLast.set(this.posCurrent);
-		this.posCurrent.add(displacement).add(this.acceleration.mul(dt * dt, new Vector2f()));
+		Vector2f displacement = this.position.sub(this.positionLast, new Vector2f());
+		this.positionLast.set(this.position);
+		this.position.add(displacement).add(this.acceleration.mul(dt * dt, new Vector2f()));
 		this.acceleration.set(0.f);
 	}
 	
@@ -49,24 +49,24 @@ public class VerletObject
 	{
 		if (this.fixed)
 			return;
-		this.posLast.set(this.posCurrent.sub(velocity.mul(dt, new Vector2f()), new Vector2f()));
+		this.positionLast.set(this.position.sub(velocity.mul(dt, new Vector2f()), new Vector2f()));
 	}
 	
 	public void addVelocity(Vector2f velocity, float dt)
 	{
 		if (this.fixed)
 			return;
-		this.posLast.sub(velocity.mul(dt));
+		this.positionLast.sub(velocity.mul(dt));
 	}
 	
 	public Vector2f getVelocity(float dt)
 	{
-		return this.posCurrent.sub(this.posLast, new Vector2f()).div(dt);
+		return this.position.sub(this.positionLast, new Vector2f()).div(dt);
 	}
 	
 	public void render(float dt, ShapeRenderer shapeRenderer, LineRenderer lineRenderer)
 	{
-		shapeRenderer.pushCircle(this.posCurrent, this.color, this.radius, .1f);
+		shapeRenderer.pushCircle(this.position, this.color, this.radius, .1f);
 		
 //		Vector2f velocity = this.getVelocity(dt);
 //		if (velocity.length() > 10.f)

@@ -36,7 +36,7 @@ public class Solver
 			for (int j = i + 1; j < this.objects.size(); j++)
 			{
 				VerletObject p2 = this.objects.get(j);
-				Vector2f dir = p1.posCurrent.sub(p2.posCurrent, new Vector2f());
+				Vector2f dir = p1.position.sub(p2.position, new Vector2f());
 				final float dist = dir.length();
 				final float minDist = p1.radius + p2.radius;
 				if (dist < minDist)
@@ -49,9 +49,9 @@ public class Solver
 					final float massRatio2 = p2.radius / minDist;
 					final float force = .5f * elasticity * (dist - minDist);
 					if (!p1.fixed)
-						p1.posCurrent.sub(dir.mul(massRatio2 * force, new Vector2f()));
+						p1.position.sub(dir.mul(massRatio2 * force, new Vector2f()));
 					if (!p2.fixed)
-						p2.posCurrent.add(dir.mul(massRatio1 * force, new Vector2f()));
+						p2.position.add(dir.mul(massRatio1 * force, new Vector2f()));
 				}
 			}
 		}
@@ -61,12 +61,12 @@ public class Solver
 	{
 		for (VerletObject verletObject : this.objects)
 		{
-			Vector2f dir = this.constraintCenter.sub(verletObject.posCurrent, new Vector2f());
+			Vector2f dir = this.constraintCenter.sub(verletObject.position, new Vector2f());
 			final float dist = dir.length();
 			if (dist > this.constraintRadius - verletObject.radius)
 			{
 				dir.normalize();
-				this.constraintCenter.sub(dir.mul(this.constraintRadius - verletObject.radius), verletObject.posCurrent);
+				this.constraintCenter.sub(dir.mul(this.constraintRadius - verletObject.radius), verletObject.position);
 			}
 		}
 	}
