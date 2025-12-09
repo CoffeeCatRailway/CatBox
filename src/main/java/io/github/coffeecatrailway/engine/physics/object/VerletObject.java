@@ -5,18 +5,18 @@ import io.github.coffeecatrailway.engine.renderer.ShapeRenderer;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 
-public class Particle
+public class VerletObject
 {
 	public Vector2f posCurrent, posLast, acceleration;
 	public Vector3f color;
 	public float radius, friction, elasticity;
 	
-	public Particle(Vector2f posCurrent, float radius)
+	public VerletObject(Vector2f posCurrent, float radius)
 	{
 		this(posCurrent, new Vector3f(1.f), radius, 0.f, 1.f);
 	}
 	
-	public Particle(Vector2f posCurrent, Vector3f color, float radius, float friction, float elasticity)
+	public VerletObject(Vector2f posCurrent, Vector3f color, float radius, float friction, float elasticity)
 	{
 		this.posCurrent = posCurrent;
 		this.posLast = new Vector2f(posCurrent);

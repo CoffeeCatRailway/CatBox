@@ -1,7 +1,7 @@
 package io.github.coffeecatrailway.engine.physics;
 
 import imgui.ImGui;
-import io.github.coffeecatrailway.engine.physics.object.Particle;
+import io.github.coffeecatrailway.engine.physics.object.VerletObject;
 import io.github.coffeecatrailway.engine.renderer.LineRenderer;
 import io.github.coffeecatrailway.engine.renderer.ShapeRenderer;
 import org.joml.Vector2f;
@@ -17,24 +17,24 @@ public class Solver
 	private final Vector2f constraintCenter = new Vector2f(0.f);
 	private float constraintRadius = 100.f;
 	
-	private final ArrayList<Particle> particles = new ArrayList<>();
+	private final ArrayList<VerletObject> objects = new ArrayList<>();
 	private float time = 0.f, frameDt = 0.f;
 	
 	private void applyGravity()
 	{
-		for (Particle particle : this.particles)
-			particle.accelerate(this.gravity);
+		for (VerletObject verletObject : this.objects)
+			verletObject.accelerate(this.gravity);
 	}
 	
 	private void checkCollisions(float dt)
 	{
 		final float elasticity = .75f;
-		for (int i = 0; i < this.particles.size(); i++)
+		for (int i = 0; i < this.objects.size(); i++)
 		{
-			Particle p1 = this.particles.get(i);
-			for (int j = i + 1; j < this.particles.size(); j++)
+			VerletObject p1 = this.objects.get(i);
+			for (int j = i + 1; j < this.objects.size(); j++)
 			{
-				Particle p2 = this.particles.get(j);
+				VerletObject p2 = this.objects.get(j);
 				Vector2f dir = p1.posCurrent.sub(p2.posCurrent, new Vector2f());
 				final float dist = dir.length();
 				final float minDist = p1.radius + p2.radius;
@@ -53,22 +53,22 @@ public class Solver
 	
 	private void applyConstraint()
 	{
-		for (Particle particle : this.particles)
+		for (VerletObject verletObject : this.objects)
 		{
-			Vector2f dir = this.constraintCenter.sub(particle.posCurrent, new Vector2f());
+			Vector2f dir = this.constraintCenter.sub(verletObject.posCurrent, new Vector2f());
 			final float dist = dir.length();
-			if (dist > this.constraintRadius - particle.radius)
+			if (dist > this.constraintRadius - verletObject.radius)
 			{
 				dir.normalize();
-				this.constraintCenter.sub(dir.mul(this.constraintRadius - particle.radius), particle.posCurrent);
+				this.constraintCenter.sub(dir.mul(this.constraintRadius - verletObject.radius), verletObject.posCurrent);
 			}
 		}
 	}
 	
 	private void updateObjects(float dt)
 	{
-		for (Particle particle: this.particles)
-			particle.update(dt);
+		for (VerletObject verletObject : this.objects)
+			verletObject.update(dt);
 	}
 	
 	public void update(float dt)
@@ -100,19 +100,19 @@ public class Solver
 		this.subSteps = subSteps;
 	}
 	
-	public boolean addParticle(Particle particle)
+	public boolean addParticle(VerletObject verletObject)
 	{
-		return this.particles.add(particle);
+		return this.objects.add(verletObject);
 	}
 	
-	public void setParticleVelocity(Particle particle, Vector2f velocity)
+	public void setParticleVelocity(VerletObject verletObject, Vector2f velocity)
 	{
-		particle.setVelocity(velocity, this.getStepDt());
+		verletObject.setVelocity(velocity, this.getStepDt());
 	}
 	
 	public int getObjectCount()
 	{
-		return this.particles.size();
+		return this.objects.size();
 	}
 	
 	public float getStepDt()
@@ -122,10 +122,10 @@ public class Solver
 	
 	public void render(ShapeRenderer shapeRenderer, LineRenderer lineRenderer)
 	{
-//		shapeRenderer.pushCircle(this.constraintCenter, new Vector3f(1.f), this.constraintRadius, .01f);
+		shapeRenderer.pushCircle(this.constraintCenter, new Vector3f(0.075f), this.constraintRadius, 0.f);
 		
-		for (Particle particle: this.particles)
-			particle.render(shapeRenderer, lineRenderer);
+		for (VerletObject verletObject : this.objects)
+			verletObject.render(shapeRenderer, lineRenderer);
 	}
 	
 	public void destroy()
@@ -135,7 +135,7 @@ public class Solver
 	
 	public void gui(float windowWidth)
 	{
-		ImGui.text(String.format("Objects: %d", this.particles.size()));
+		ImGui.text(String.format("Objects: %d", this.objects.size()));
 		ImGui.text(String.format("Time elapsed: %f", this.time));
 		ImGui.text(String.format("Sub steps: %d", this.subSteps));
 		ImGui.text(String.format("Frame dt: %f", this.frameDt));

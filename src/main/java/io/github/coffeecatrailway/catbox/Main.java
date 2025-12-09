@@ -2,7 +2,7 @@ package io.github.coffeecatrailway.catbox;
 
 import imgui.ImGui;
 import io.github.coffeecatrailway.engine.physics.Solver;
-import io.github.coffeecatrailway.engine.physics.object.Particle;
+import io.github.coffeecatrailway.engine.physics.object.VerletObject;
 import io.github.coffeecatrailway.engine.renderer.LineRenderer;
 import io.github.coffeecatrailway.engine.renderer.ShapeRenderer;
 import io.github.coffeecatrailway.engine.renderer.window.ImGUIWrapper;
@@ -42,8 +42,8 @@ public class Main
 	private Solver solver;
 	
 	// Options
-	private boolean vSync = true, pauseFixed = true, btnStepFixed = false;
-	private final float worldView = 100.f;
+	private boolean vSync = false, pauseFixed = true, btnStepFixed = false;
+	private final float worldView = 200.f;
 	
 	private final float[] backgroundColor = {
 			// 0.f, 0.f, 0.f
@@ -65,7 +65,7 @@ public class Main
 		System.out.println("ImGUI: " + ImGui.getVersion());
 		
 		this.window = new Window(Math.roundHalfDown(1600.f * .8f), Math.roundHalfDown(900.f * .8f));
-		this.window.init("CatBox", true, GLFW_PLATFORM_X11); // Wrong, we're on wayland but anyway...
+		this.window.init("CatBox", this.vSync, GLFW_PLATFORM_X11); // Wrong, we're on wayland but anyway...
 		GLFWFramebufferSizeCallbackI callback = (window, width, height) -> this.updateTransform((float) width / (float) height);
 		this.window.setFramebufferCallback(callback);
 		this.updateTransform((float) this.window.getWidth() / (float) this.window.getHeight());
@@ -146,11 +146,11 @@ public class Main
 	
 	private void fixedUpdate(float dt)
 	{
-		if (this.solver.getObjectCount() < 2000 && (this.fixedFrameCount % 8) == 0)
+		if (this.solver.getObjectCount() < 1000 && (this.fixedFrameCount % 8) == 0)
 		{
-			Particle particle = new Particle(new Vector2f(0.f, this.worldView * .75f), 2.f);
-			this.solver.addParticle(particle);
-			this.solver.setParticleVelocity(particle, new Vector2f(100.f, 0.f));
+			VerletObject verletObject = new VerletObject(new Vector2f(0.f, this.worldView * .75f), 2.5f);
+			this.solver.addParticle(verletObject);
+			this.solver.setParticleVelocity(verletObject, new Vector2f(125.f, 0.f));
 		}
 		
 		this.solver.update(dt);
