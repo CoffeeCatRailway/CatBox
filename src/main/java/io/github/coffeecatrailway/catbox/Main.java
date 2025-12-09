@@ -7,9 +7,8 @@ import io.github.coffeecatrailway.engine.renderer.LineRenderer;
 import io.github.coffeecatrailway.engine.renderer.ShapeRenderer;
 import io.github.coffeecatrailway.engine.renderer.window.ImGUIWrapper;
 import io.github.coffeecatrailway.engine.renderer.window.Window;
+import org.joml.*;
 import org.joml.Math;
-import org.joml.Matrix4f;
-import org.joml.Vector2f;
 import org.lwjgl.Version;
 import org.lwjgl.glfw.GLFWFramebufferSizeCallbackI;
 
@@ -18,32 +17,20 @@ import static org.lwjgl.opengl.GL11.*;
 
 public class Main
 {
-	/*
-	 * Check List:
-	 * [O] Window/LWJGL
-	 * [O] ImGUI
-	 * [O] Renderer, queue system for basic shapes (Circle, Box, Line)
-	 * [O] Debug line renderer
-	 * [X] Physics engine:
-	 *    [X] Basic forces
-	 *    [X] Simple collision detection/response (Circle, Box, Line)
-	 *    [X] Constraints (Springs/Soft, Hard)
-	 *    [X] Advanced-Line (polygon) collision detection/response
-	 *    [X] Rigid body
-	 */
-	
 	// System
 	private Window window;
 	private final ImGUIWrapper imgui = new ImGUIWrapper();
+	
 	private final Matrix4f transformMatrix = new Matrix4f();
 	private ShapeRenderer shapeRenderer;
 	private LineRenderer lineRenderer;
 	
+	private final Random random = new Random(0L);
 	private Solver solver;
 	
 	// Options
 	private boolean vSync = false, pauseFixed = true, btnStepFixed = false;
-	private final float worldView = 200.f;
+	private final float worldView = 600.f;
 	
 	private final float[] backgroundColor = {
 			// 0.f, 0.f, 0.f
@@ -64,7 +51,7 @@ public class Main
 		System.out.println("LWJGL: " + Version.getVersion());
 		System.out.println("ImGUI: " + ImGui.getVersion());
 		
-		this.window = new Window(Math.roundHalfDown(1600.f * .8f), Math.roundHalfDown(900.f * .8f));
+		this.window = new Window(1000, 800);
 		this.window.init("CatBox", this.vSync, GLFW_PLATFORM_X11); // Wrong, we're on wayland but anyway...
 		GLFWFramebufferSizeCallbackI callback = (window, width, height) -> this.updateTransform((float) width / (float) height);
 		this.window.setFramebufferCallback(callback);
@@ -144,13 +131,24 @@ public class Main
 	
 	}
 	
+	private Vector3f getRainbow(float t)
+	{
+		final float r = Math.sin(t) * .5f + .5f;
+		final float g = Math.sin(t + .33f * 2.f * Math.PI_f) * .5f + .5f;
+		final float b = Math.sin(t + .66f * 2.f * Math.PI_f) * .5f + .5f;
+		return new Vector3f(r, g, b);
+	}
+	
 	private void fixedUpdate(float dt)
 	{
-		if (this.solver.getObjectCount() < 1000 && (this.fixedFrameCount % 8) == 0)
+		if (this.solver.getObjectCount() < 1000 && (this.fixedFrameCount % 6) == 0)
 		{
-			VerletObject verletObject = new VerletObject(new Vector2f(0.f, this.worldView * .75f), 2.5f);
+			final float radius = 2.5f + this.random.nextFloat() * (10.f - 2.5f);
+			Vector2f velocity = new Vector2f(400.f * Math.sin(this.solver.getTime()), -200.f);
+			VerletObject verletObject = new VerletObject(new Vector2f(0.f, this.worldView * .75f), radius);
+			verletObject.color = this.getRainbow(this.solver.getTime());
 			this.solver.addParticle(verletObject);
-			this.solver.setParticleVelocity(verletObject, new Vector2f(125.f, 0.f));
+			this.solver.setParticleVelocity(verletObject, velocity);
 		}
 		
 		this.solver.update(dt);

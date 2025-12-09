@@ -12,7 +12,7 @@ import java.util.ArrayList;
 public class Solver
 {
 	private int subSteps = 1;
-	private final Vector2f gravity = new Vector2f(0.f, -98.1f);
+	private final Vector2f gravity = new Vector2f(0.f, -100.f);
 	
 	private final Vector2f constraintCenter = new Vector2f(0.f);
 	private float constraintRadius = 100.f;
@@ -118,6 +118,11 @@ public class Solver
 	public float getStepDt()
 	{
 		return this.frameDt / (float) this.subSteps;
+	}
+	
+	public float getTime()
+	{
+		return this.time;
 	}
 	
 	public void render(ShapeRenderer shapeRenderer, LineRenderer lineRenderer)
