@@ -13,7 +13,6 @@ import static org.lwjgl.opengl.GL15.glDeleteBuffers;
 import static org.lwjgl.opengl.GL30.glBindVertexArray;
 import static org.lwjgl.opengl.GL30.glDeleteVertexArrays;
 import static org.lwjgl.opengl.GL45.*;
-import static org.lwjgl.opengl.GL45.glEnableVertexArrayAttrib;
 
 public class LineRenderer
 {

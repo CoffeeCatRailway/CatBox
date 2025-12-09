@@ -7,8 +7,10 @@ import io.github.coffeecatrailway.engine.renderer.LineRenderer;
 import io.github.coffeecatrailway.engine.renderer.ShapeRenderer;
 import io.github.coffeecatrailway.engine.renderer.window.ImGUIWrapper;
 import io.github.coffeecatrailway.engine.renderer.window.Window;
-import org.joml.*;
 import org.joml.Math;
+import org.joml.Matrix4f;
+import org.joml.Vector2f;
+import org.joml.Vector3f;
 import org.lwjgl.Version;
 import org.lwjgl.glfw.GLFWFramebufferSizeCallbackI;
 
@@ -25,7 +27,6 @@ public class Main
 	private ShapeRenderer shapeRenderer;
 	private LineRenderer lineRenderer;
 	
-	private final Random random = new Random(0L);
 	private Solver solver;
 	
 	// Options
@@ -143,10 +144,13 @@ public class Main
 	{
 		if (this.solver.getObjectCount() < 1000 && (this.fixedFrameCount % 6) == 0)
 		{
-			final float radius = 2.5f + this.random.nextFloat() * (10.f - 2.5f);
+			final float radius = RandUtil.getRange(2.5f, 10.f);
 			Vector2f velocity = new Vector2f(400.f * Math.sin(this.solver.getTime()), -200.f);
+			
 			VerletObject verletObject = new VerletObject(new Vector2f(0.f, this.worldView * .75f), radius);
 			verletObject.color = this.getRainbow(this.solver.getTime());
+			verletObject.fixed = this.solver.getObjectCount() <= 2;
+			
 			this.solver.addParticle(verletObject);
 			this.solver.setParticleVelocity(verletObject, velocity);
 		}

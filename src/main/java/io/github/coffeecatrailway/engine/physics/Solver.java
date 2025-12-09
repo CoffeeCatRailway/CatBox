@@ -1,6 +1,7 @@
 package io.github.coffeecatrailway.engine.physics;
 
 import imgui.ImGui;
+import io.github.coffeecatrailway.catbox.RandUtil;
 import io.github.coffeecatrailway.engine.physics.object.VerletObject;
 import io.github.coffeecatrailway.engine.renderer.LineRenderer;
 import io.github.coffeecatrailway.engine.renderer.ShapeRenderer;
@@ -41,11 +42,16 @@ public class Solver
 				if (dist < minDist)
 				{
 					dir.normalize();
+					if (Math.signum(dist) == 0)
+						dir.set(RandUtil.getVec2f());
+					
 					final float massRatio1 = p1.radius / minDist;
 					final float massRatio2 = p2.radius / minDist;
 					final float force = .5f * elasticity * (dist - minDist);
-					p1.posCurrent.sub(dir.mul(massRatio2 * force, new Vector2f()));
-					p2.posCurrent.add(dir.mul(massRatio1 * force, new Vector2f()));
+					if (!p1.fixed)
+						p1.posCurrent.sub(dir.mul(massRatio2 * force, new Vector2f()));
+					if (!p2.fixed)
+						p2.posCurrent.add(dir.mul(massRatio1 * force, new Vector2f()));
 				}
 			}
 		}

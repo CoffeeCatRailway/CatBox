@@ -10,6 +10,7 @@ public class VerletObject
 	public Vector2f posCurrent, posLast, acceleration;
 	public Vector3f color;
 	public float radius, friction, elasticity;
+	public boolean fixed = false;
 	
 	public VerletObject(Vector2f posCurrent, float radius)
 	{
@@ -29,6 +30,8 @@ public class VerletObject
 	
 	public void update(float dt)
 	{
+		if (this.fixed)
+			return;
 		Vector2f displacement = this.posCurrent.sub(this.posLast, new Vector2f());
 		this.posLast.set(this.posCurrent);
 		this.posCurrent.add(displacement).add(this.acceleration.mul(dt * dt, new Vector2f()));
@@ -37,16 +40,22 @@ public class VerletObject
 	
 	public void accelerate(Vector2f acceleration)
 	{
+		if (this.fixed)
+			return;
 		this.acceleration.add(acceleration);
 	}
 	
 	public void setVelocity(Vector2f velocity, float dt)
 	{
+		if (this.fixed)
+			return;
 		this.posLast.set(this.posCurrent.sub(velocity.mul(dt, new Vector2f()), new Vector2f()));
 	}
 	
 	public void addVelocity(Vector2f velocity, float dt)
 	{
+		if (this.fixed)
+			return;
 		this.posLast.sub(velocity.mul(dt));
 	}
 	
