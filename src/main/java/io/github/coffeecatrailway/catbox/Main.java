@@ -70,6 +70,10 @@ public class Main
 		this.solver.setConstraint(new Vector2f(0.f), this.worldView);
 		this.solver.setSubSteps(8);
 		this.solver.setTps(this.ticksPerSecond);
+		
+		VerletObject obj = new VerletObject(new Vector2f(0.f), 50.f);
+		obj.fixed = true;
+		this.solver.addObject(obj);
 	}
 	
 	private void updateTransform(float aspect)
@@ -80,51 +84,6 @@ public class Main
 		float bottom = -this.worldView / (aspectOne ? 1.f : aspect);
 		float top = this.worldView / (aspectOne ? 1.f : aspect);
 		this.transformMatrix.setOrtho(left, right, bottom, top, -1.f, 1.f);
-	}
-	
-	private void run()
-	{
-		float accumulatedSeconds = 0.f;
-		this.sysTimer.tick();
-		this.updateTimer.tick();
-		
-		System.out.println("Starting main loop");
-		while (!glfwWindowShouldClose(this.window.getHandle()))
-		{
-			
-			// Get amount of time passed for one cycle
-			this.sysTimer.tick();
-			accumulatedSeconds += this.sysTimer.getElapsedSeconds();
-			
-			// update
-			this.update(this.sysTimer.getElapsedSeconds());
-			
-			if (accumulatedSeconds > this.cycleTime)
-			{
-				accumulatedSeconds -= this.cycleTime;
-				this.updateTimer.tick();
-				if (!this.pauseFixed || this.btnStepFixed)
-				{
-					this.fixedUpdate(this.updateTimer.getElapsedSeconds());
-					this.fixedFrameCount++;
-					this.btnStepFixed = false;
-				}
-			}
-			
-			this.imgui.update();
-			this.gui();
-			
-			// render
-			glClearColor(this.backgroundColor[0], this.backgroundColor[1], this.backgroundColor[2], 1.f);
-			glClear(GL_COLOR_BUFFER_BIT);
-			
-			this.render();
-			this.frameCount++;
-			
-			// Swap buffer & poll events
-			glfwSwapBuffers(this.window.getHandle());
-			glfwPollEvents();
-		}
 	}
 	
 	private void update(float dt)
@@ -144,15 +103,15 @@ public class Main
 	{
 		if (this.solver.getObjectCount() < 1000 && (this.fixedFrameCount % 6) == 0)
 		{
-			final float radius = RandUtil.getRange(2.5f, 10.f);
-			Vector2f velocity = new Vector2f(400.f * Math.sin(this.solver.getTime()), -200.f);
+			final float radius = RandUtil.getRange(2.f, 15.f);
+			Vector2f velocity = new Vector2f(500.f * Math.sin(this.solver.getTime()), -250.f);
 			
 			VerletObject verletObject = new VerletObject(new Vector2f(0.f, this.worldView * .75f), radius);
 			verletObject.color = this.getRainbow(this.solver.getTime());
-			verletObject.fixed = this.solver.getObjectCount() <= 2;
+//			verletObject.fixed = this.solver.getObjectCount() <= 2;
 			
-			this.solver.addParticle(verletObject);
-			this.solver.setParticleVelocity(verletObject, velocity);
+			this.solver.addObject(verletObject);
+			this.solver.setObjectVelocity(verletObject, velocity);
 		}
 		
 		this.solver.update(dt);
@@ -216,6 +175,51 @@ public class Main
 			this.solver.gui(windowWidth);
 		}
 		ImGui.end();
+	}
+	
+	private void run()
+	{
+		float accumulatedSeconds = 0.f;
+		this.sysTimer.tick();
+		this.updateTimer.tick();
+		
+		System.out.println("Starting main loop");
+		while (!glfwWindowShouldClose(this.window.getHandle()))
+		{
+			
+			// Get amount of time passed for one cycle
+			this.sysTimer.tick();
+			accumulatedSeconds += this.sysTimer.getElapsedSeconds();
+			
+			// update
+			this.update(this.sysTimer.getElapsedSeconds());
+			
+			if (accumulatedSeconds > this.cycleTime)
+			{
+				accumulatedSeconds -= this.cycleTime;
+				this.updateTimer.tick();
+				if (!this.pauseFixed || this.btnStepFixed)
+				{
+					this.fixedUpdate(this.updateTimer.getElapsedSeconds());
+					this.fixedFrameCount++;
+					this.btnStepFixed = false;
+				}
+			}
+			
+			this.imgui.update();
+			this.gui();
+			
+			// render
+			glClearColor(this.backgroundColor[0], this.backgroundColor[1], this.backgroundColor[2], 1.f);
+			glClear(GL_COLOR_BUFFER_BIT);
+			
+			this.render();
+			this.frameCount++;
+			
+			// Swap buffer & poll events
+			glfwSwapBuffers(this.window.getHandle());
+			glfwPollEvents();
+		}
 	}
 	
 	private void destroy()

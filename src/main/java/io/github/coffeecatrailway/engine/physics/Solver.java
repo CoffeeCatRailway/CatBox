@@ -106,12 +106,12 @@ public class Solver
 		this.subSteps = subSteps;
 	}
 	
-	public boolean addParticle(VerletObject verletObject)
+	public boolean addObject(VerletObject verletObject)
 	{
 		return this.objects.add(verletObject);
 	}
 	
-	public void setParticleVelocity(VerletObject verletObject, Vector2f velocity)
+	public void setObjectVelocity(VerletObject verletObject, Vector2f velocity)
 	{
 		verletObject.setVelocity(velocity, this.getStepDt());
 	}
