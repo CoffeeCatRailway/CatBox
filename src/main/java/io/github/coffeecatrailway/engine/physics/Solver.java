@@ -13,7 +13,7 @@ import java.util.ArrayList;
 public class Solver
 {
 	private int subSteps = 1;
-	private final Vector2f gravity = new Vector2f(0.f, -100.f);
+	private final Vector2f gravity = new Vector2f(0.f, -200.f);
 	
 	private final Vector2f constraintCenter = new Vector2f(0.f);
 	private float constraintRadius = 100.f;
@@ -26,10 +26,9 @@ public class Solver
 		for (VerletObject obj : this.objects)
 			obj.accelerate(this.gravity);
 	}
-	
+
 	private void checkCollisions(float dt)
 	{
-		final float elasticity = .75f;
 		for (int i = 0; i < this.objects.size(); i++)
 		{
 			VerletObject p1 = this.objects.get(i);
@@ -47,7 +46,8 @@ public class Solver
 					
 					final float massRatio1 = p1.radius / minDist;
 					final float massRatio2 = p2.radius / minDist;
-					final float force = .5f * elasticity * (dist - minDist);
+					final float force = .5f * ((p1.elasticity + p2.elasticity) * .5f) * (dist - minDist);
+
 					if (!p1.fixed)
 						p1.position.sub(dir.mul(massRatio2 * force, new Vector2f()));
 					if (!p2.fixed)
@@ -57,7 +57,7 @@ public class Solver
 		}
 	}
 	
-	private void applyConstraint()
+	private void applyConstraint(float dt)
 	{
 		for (VerletObject obj : this.objects)
 		{
@@ -66,8 +66,10 @@ public class Solver
 			if (dist > this.constraintRadius - obj.radius)
 			{
 				dir.normalize();
-//				obj.positionLast.set(obj.position);
+				Vector2f velocity = obj.getVelocity(dt);
+
 				this.constraintCenter.sub(dir.mul(this.constraintRadius - obj.radius), obj.position);
+				obj.setVelocity(velocity.negate().mul(obj.elasticity), dt);
 			}
 		}
 	}
@@ -86,7 +88,7 @@ public class Solver
 		{
 			this.applyGravity();
 			this.checkCollisions(stepDt);
-			this.applyConstraint();
+			this.applyConstraint(stepDt);
 			this.updateObjects(stepDt);
 		}
 	}

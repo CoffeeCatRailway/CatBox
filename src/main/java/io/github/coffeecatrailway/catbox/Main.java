@@ -76,9 +76,9 @@ public class Main
 		this.solver.setSubSteps(8);
 		this.solver.setTps(this.ticksPerSecond);
 		
-		VerletObject obj = new VerletObject(new Vector2f(0.f), 50.f);
-		obj.fixed = true;
-		this.solver.addObject(obj);
+//		VerletObject obj = new VerletObject(new Vector2f(0.f), 50.f);
+////		obj.fixed = true;
+//		this.solver.addObject(obj);
 	}
 	
 	private void updateTransform(float aspect)
@@ -106,15 +106,15 @@ public class Main
 	
 	private void fixedUpdate(float dt)
 	{
-		if (this.solver.getObjectCount() < 1000 && (this.fixedFrameCount % 6) == 0)
+		if (this.solver.getObjectCount() < 1000 && (this.fixedFrameCount % 5) == 0)
 		{
 			final float radius = RandUtil.getRange(2.f, 15.f);
-			Vector2f velocity = new Vector2f(500.f * Math.sin(this.solver.getTime()), -250.f);
-			
+			Vector2f velocity = new Vector2f(500.f * Math.sin(this.solver.getTime()), -400.f);
+
 			VerletObject verletObject = new VerletObject(new Vector2f(0.f, this.worldView * .75f), radius);
 			verletObject.color = this.getRainbow(this.solver.getTime());
 //			verletObject.fixed = this.solver.getObjectCount() <= 2;
-			
+
 			this.solver.addObject(verletObject);
 			this.solver.setObjectVelocity(verletObject, velocity);
 		}
