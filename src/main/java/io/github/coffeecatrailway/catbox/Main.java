@@ -77,7 +77,7 @@ public class Main
 		this.solver.setTps(this.ticksPerSecond);
 		
 //		VerletObject obj = new VerletObject(new Vector2f(0.f), 50.f);
-////		obj.fixed = true;
+//		obj.fixed = true;
 //		this.solver.addObject(obj);
 	}
 	
@@ -111,12 +111,12 @@ public class Main
 			final float radius = RandUtil.getRange(2.f, 15.f);
 			Vector2f velocity = new Vector2f(500.f * Math.sin(this.solver.getTime()), -400.f);
 
-			VerletObject verletObject = new VerletObject(new Vector2f(0.f, this.worldView * .75f), radius);
-			verletObject.color = this.getRainbow(this.solver.getTime());
-//			verletObject.fixed = this.solver.getObjectCount() <= 2;
+			VerletObject obj = new VerletObject(new Vector2f(0.f, this.worldView * .75f), radius);
+			obj.color = this.getRainbow(this.solver.getTime());
+			obj.elasticity = .5f;
 
-			this.solver.addObject(verletObject);
-			this.solver.setObjectVelocity(verletObject, velocity);
+			this.solver.addObject(obj);
+			this.solver.setObjectVelocity(obj, velocity);
 		}
 		
 		this.solver.update(dt);
