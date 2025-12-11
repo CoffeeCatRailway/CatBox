@@ -13,7 +13,7 @@ import java.util.ArrayList;
 public class Solver
 {
 	private int subSteps = 1;
-	private final Vector2f gravity = new Vector2f(0.f, -200.f);
+	public final Vector2f gravity = new Vector2f(0.f, -200.f);
 	
 	private final Vector2f constraintCenter = new Vector2f(0.f);
 	private float constraintRadius = 100.f;
@@ -66,10 +66,10 @@ public class Solver
 			if (dist > this.constraintRadius - obj.radius)
 			{
 				dir.normalize();
-				Vector2f velocity = obj.getVelocity(dt);
-
 				this.constraintCenter.sub(dir.mul(this.constraintRadius - obj.radius), obj.position);
-				obj.setVelocity(velocity.negate().mul(obj.elasticity), dt);
+				
+//				final float force = .5f * obj.elasticity * (this.constraintRadius - (this.constraintRadius - obj.radius));
+//				obj.position.add(dir.mul(force / obj.radius));
 			}
 		}
 	}

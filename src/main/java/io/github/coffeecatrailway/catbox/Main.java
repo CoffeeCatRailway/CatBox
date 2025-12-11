@@ -76,9 +76,16 @@ public class Main
 		this.solver.setSubSteps(8);
 		this.solver.setTps(this.ticksPerSecond);
 		
-//		VerletObject obj = new VerletObject(new Vector2f(0.f), 50.f);
+		this.solver.gravity.set(0.f);
+		
+		VerletObject obj = new VerletObject(new Vector2f(100.f, 0.f), 50.f);
+		this.solver.addObject(obj);
 //		obj.fixed = true;
-//		this.solver.addObject(obj);
+		obj.setVelocity(new Vector2f(-100.f , 0.f), this.solver.getStepDt());
+		
+		VerletObject obj1 = new VerletObject(new Vector2f(-100.f, 0.f), 25.f);
+		this.solver.addObject(obj1);
+		obj1.setVelocity(new Vector2f(100.f , 0.f), this.solver.getStepDt());
 	}
 	
 	private void updateTransform(float aspect)
@@ -106,18 +113,18 @@ public class Main
 	
 	private void fixedUpdate(float dt)
 	{
-		if (this.solver.getObjectCount() < 1000 && (this.fixedFrameCount % 5) == 0)
-		{
-			final float radius = RandUtil.getRange(2.f, 15.f);
-			Vector2f velocity = new Vector2f(500.f * Math.sin(this.solver.getTime()), -400.f);
-
-			VerletObject obj = new VerletObject(new Vector2f(0.f, this.worldView * .75f), radius);
-			obj.color = this.getRainbow(this.solver.getTime());
-			obj.elasticity = .5f;
-
-			this.solver.addObject(obj);
-			this.solver.setObjectVelocity(obj, velocity);
-		}
+//		if (this.solver.getObjectCount() < 1000 && (this.fixedFrameCount % 5) == 0)
+//		{
+//			final float radius = RandUtil.getRange(2.f, 15.f);
+//			Vector2f velocity = new Vector2f(500.f * Math.sin(this.solver.getTime()), -400.f);
+//
+//			VerletObject obj = new VerletObject(new Vector2f(0.f, this.worldView * .75f), radius);
+//			obj.color = this.getRainbow(this.solver.getTime());
+//			obj.elasticity = .5f;
+//
+//			this.solver.addObject(obj);
+//			this.solver.setObjectVelocity(obj, velocity);
+//		}
 		
 		this.solver.update(dt);
 	}

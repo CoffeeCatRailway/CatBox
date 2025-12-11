@@ -72,8 +72,8 @@ public class VerletObject
 //		if (velocity.length() > 10.f)
 //		{
 //			Vector3f color = new Vector3f(1.f).sub(this.color);
-//			Vector2f p2 = new Vector2f(this.posCurrent).add(velocity.mul(.5f));
-//			lineRenderer.pushLine(this.posCurrent, color, p2, color);
+//			Vector2f p2 = new Vector2f(this.position).add(velocity.mul(.5f));
+//			lineRenderer.pushLine(this.position, color, p2, color);
 //		}
 	}
 }
