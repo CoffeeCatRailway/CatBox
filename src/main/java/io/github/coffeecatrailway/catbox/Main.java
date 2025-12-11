@@ -14,6 +14,8 @@ import org.joml.Vector3f;
 import org.lwjgl.Version;
 import org.lwjgl.glfw.GLFWFramebufferSizeCallbackI;
 
+import java.util.Locale;
+
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 
@@ -53,7 +55,10 @@ public class Main
 		System.out.println("ImGUI: " + ImGui.getVersion());
 		
 		this.window = new Window(1000, 800);
-		this.window.init("CatBox", this.vSync, GLFW_PLATFORM_X11); // Wrong, we're on wayland but anyway...
+		// Hacky and wrong-ish, I use wayland not x11
+		final int platform = System.getProperty("os.name").toLowerCase(Locale.ROOT).contains("linux") ? GLFW_PLATFORM_X11 : GLFW_ANY_PLATFORM;
+		this.window.init("CatBox", this.vSync, platform);
+
 		GLFWFramebufferSizeCallbackI callback = (window, width, height) -> this.updateTransform((float) width / (float) height);
 		this.window.setFramebufferCallback(callback);
 		this.updateTransform((float) this.window.getWidth() / (float) this.window.getHeight());
@@ -232,7 +237,7 @@ public class Main
 		this.window.destroy();
 	}
 	
-	static void main()
+	public static void main(String[] args)
 	{
 		Main main = new Main();
 		main.init();
