@@ -23,8 +23,8 @@ public class Solver
 	
 	private void applyGravity()
 	{
-		for (VerletObject verletObject : this.objects)
-			verletObject.accelerate(this.gravity);
+		for (VerletObject obj : this.objects)
+			obj.accelerate(this.gravity);
 	}
 	
 	private void checkCollisions(float dt)
@@ -59,22 +59,23 @@ public class Solver
 	
 	private void applyConstraint()
 	{
-		for (VerletObject verletObject : this.objects)
+		for (VerletObject obj : this.objects)
 		{
-			Vector2f dir = this.constraintCenter.sub(verletObject.position, new Vector2f());
+			Vector2f dir = this.constraintCenter.sub(obj.position, new Vector2f());
 			final float dist = dir.length();
-			if (dist > this.constraintRadius - verletObject.radius)
+			if (dist > this.constraintRadius - obj.radius)
 			{
 				dir.normalize();
-				this.constraintCenter.sub(dir.mul(this.constraintRadius - verletObject.radius), verletObject.position);
+//				obj.positionLast.set(obj.position);
+				this.constraintCenter.sub(dir.mul(this.constraintRadius - obj.radius), obj.position);
 			}
 		}
 	}
 	
 	private void updateObjects(float dt)
 	{
-		for (VerletObject verletObject : this.objects)
-			verletObject.update(dt);
+		for (VerletObject obj : this.objects)
+			obj.update(dt);
 	}
 	
 	public void update(float dt)
@@ -106,14 +107,14 @@ public class Solver
 		this.subSteps = subSteps;
 	}
 	
-	public boolean addObject(VerletObject verletObject)
+	public boolean addObject(VerletObject obj)
 	{
-		return this.objects.add(verletObject);
+		return this.objects.add(obj);
 	}
 	
-	public void setObjectVelocity(VerletObject verletObject, Vector2f velocity)
+	public void setObjectVelocity(VerletObject obj, Vector2f velocity)
 	{
-		verletObject.setVelocity(velocity, this.getStepDt());
+		obj.setVelocity(velocity, this.getStepDt());
 	}
 	
 	public int getObjectCount()
@@ -135,8 +136,8 @@ public class Solver
 	{
 		shapeRenderer.pushCircle(this.constraintCenter, new Vector3f(0.075f), this.constraintRadius, 0.f);
 		
-		for (VerletObject verletObject : this.objects)
-			verletObject.render(this.frameDt, shapeRenderer, lineRenderer);
+		for (VerletObject obj : this.objects)
+			obj.render(this.frameDt, shapeRenderer, lineRenderer);
 	}
 	
 	public void destroy()
