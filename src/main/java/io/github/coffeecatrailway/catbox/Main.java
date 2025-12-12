@@ -2,6 +2,7 @@ package io.github.coffeecatrailway.catbox;
 
 import imgui.ImGui;
 import io.github.coffeecatrailway.engine.physics.Solver;
+import io.github.coffeecatrailway.engine.physics.object.Line;
 import io.github.coffeecatrailway.engine.physics.object.VerletObject;
 import io.github.coffeecatrailway.engine.renderer.LineRenderer;
 import io.github.coffeecatrailway.engine.renderer.ShapeRenderer;
@@ -78,14 +79,25 @@ public class Main
 		
 		this.solver.gravity.set(0.f);
 		
-		VerletObject obj = new VerletObject(new Vector2f(100.f, 0.f), 50.f);
-		this.solver.addObject(obj);
-//		obj.fixed = true;
-		obj.setVelocity(new Vector2f(-100.f , 0.f), this.solver.getStepDt());
-		
-		VerletObject obj1 = new VerletObject(new Vector2f(-100.f, 0.f), 25.f);
+		VerletObject obj1 = new VerletObject(new Vector2f(100.f), 20.f);
 		this.solver.addObject(obj1);
-		obj1.setVelocity(new Vector2f(100.f , 0.f), this.solver.getStepDt());
+//		obj1.fixed = true;
+		obj1.setVelocity(new Vector2f(0.f , -200.f), this.solver.getStepDt());
+		
+		VerletObject obj2 = new VerletObject(new Vector2f(-100.f), 20.f);
+		this.solver.addObject(obj2);
+//		obj2.setVelocity(new Vector2f(0.f , 200.f), this.solver.getStepDt());
+		
+		VerletObject lo1 = new VerletObject(new Vector2f(-200.f, 0.f), 10.f);
+//		lo1.fixed = true;
+		this.solver.addObject(lo1);
+//		lo1.setVelocity(new Vector2f(0.f, 200.f), this.solver.getStepDt());
+		VerletObject lo2 = new VerletObject(new Vector2f(200.f, 0.f), 10.f);
+//		lo2.fixed = true;
+		this.solver.addObject(lo2);
+//		lo2.setVelocity(new Vector2f(0.f, 200.f), this.solver.getStepDt());
+		Line line = new Line(lo1, lo2, 20.f);
+		this.solver.addLine(line);
 	}
 	
 	private void updateTransform(float aspect)
