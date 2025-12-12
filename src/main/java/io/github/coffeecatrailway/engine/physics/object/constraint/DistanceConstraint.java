@@ -29,8 +29,10 @@ public class DistanceConstraint implements Constraint
 		Vector2f offset = delta.mul(this.distance / delta.length(), new Vector2f()); // Required delta
 		offset.sub(delta).mul(.5f); // offset
 		
-		this.obj1.position.sub(offset);
-		this.obj2.position.add(offset);
+		if (!this.obj1.fixed)
+			this.obj1.position.sub(offset);
+		if (!this.obj2.fixed)
+			this.obj2.position.add(offset);
 	}
 	
 	@Override
