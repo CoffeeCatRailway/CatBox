@@ -105,7 +105,6 @@ public class Main
 //		this.solver.addConstraint(distConstraint);
 		
 		VerletObject chainObjLast = new VerletObject(new Vector2f(-165.f, 0.f), 10.f);
-		chainObjLast.position.x += 10.f;
 		chainObjLast.elasticity = .75f;
 		chainObjLast.fixed = true;
 		this.solver.addObject(chainObjLast);
@@ -118,12 +117,11 @@ public class Main
 			LineObject lineObj = new LineObject(chainObjLast, chainObj);
 			this.solver.addLineObj(lineObj);
 			
-			DistanceConstraint constraint = new DistanceConstraint(chainObjLast, chainObj, 30.f);
+			DistanceConstraint constraint = new DistanceConstraint(chainObjLast, chainObj, 40.f);
 			this.solver.addConstraint(constraint);
 			
 			chainObjLast = chainObj;
 		}
-		chainObjLast.position.x -= 10.f;
 		chainObjLast.fixed = true;
 	}
 	
