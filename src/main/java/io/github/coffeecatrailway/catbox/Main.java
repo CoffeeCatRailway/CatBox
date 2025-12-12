@@ -2,7 +2,7 @@ package io.github.coffeecatrailway.catbox;
 
 import imgui.ImGui;
 import io.github.coffeecatrailway.engine.physics.Solver;
-import io.github.coffeecatrailway.engine.physics.object.Line;
+import io.github.coffeecatrailway.engine.physics.object.LineObject;
 import io.github.coffeecatrailway.engine.physics.object.VerletObject;
 import io.github.coffeecatrailway.engine.physics.object.constraint.DistanceConstraint;
 import io.github.coffeecatrailway.engine.renderer.LineRenderer;
@@ -98,8 +98,8 @@ public class Main
 //		this.solver.addObject(lo2);
 ////		lo2.setVelocity(new Vector2f(0.f, 200.f), this.solver.getStepDt());
 //
-//		Line line = new Line(lo1, lo2, 20.f);
-//		this.solver.addLine(line);
+//		LineObject lineObj = new LineObject(lo1, lo2, 20.f);
+//		this.solver.addLineObj(lineObj);
 //
 //		DistanceConstraint distConstraint = new DistanceConstraint(lo1, lo2);
 //		this.solver.addConstraint(distConstraint);
@@ -115,8 +115,8 @@ public class Main
 			chainObj.elasticity = .75f;
 			this.solver.addObject(chainObj);
 			
-			Line lineObj = new Line(chainObjLast, chainObj);
-			this.solver.addLine(lineObj);
+			LineObject lineObj = new LineObject(chainObjLast, chainObj);
+			this.solver.addLineObj(lineObj);
 			
 			DistanceConstraint constraint = new DistanceConstraint(chainObjLast, chainObj, 30.f);
 			this.solver.addConstraint(constraint);

@@ -6,17 +6,17 @@ import org.joml.Math;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 
-public class Line
+public class LineObject
 {
 	public VerletObject obj1, obj2;
 	public float thickness;
 	
-	public Line(VerletObject obj1, VerletObject obj2)
+	public LineObject(VerletObject obj1, VerletObject obj2)
 	{
 		this(obj1, obj2, obj1.radius * 2.f);
 	}
 	
-	public Line(VerletObject obj1, VerletObject obj2, float thickness)
+	public LineObject(VerletObject obj1, VerletObject obj2, float thickness)
 	{
 		this.obj1 = obj1;
 		this.obj2 = obj2;

@@ -2,7 +2,7 @@ package io.github.coffeecatrailway.engine.physics;
 
 import imgui.ImGui;
 import io.github.coffeecatrailway.catbox.RandUtil;
-import io.github.coffeecatrailway.engine.physics.object.Line;
+import io.github.coffeecatrailway.engine.physics.object.LineObject;
 import io.github.coffeecatrailway.engine.physics.object.VerletObject;
 import io.github.coffeecatrailway.engine.physics.object.constraint.Constraint;
 import io.github.coffeecatrailway.engine.renderer.LineRenderer;
@@ -22,7 +22,7 @@ public class Solver
 	private float constraintRadius = 100.f;
 	
 	private final ArrayList<VerletObject> objects = new ArrayList<>();
-	private final ArrayList<Line> lines = new ArrayList<>();
+	private final ArrayList<LineObject> lineObjects = new ArrayList<>();
 	private final ArrayList<Constraint> constraints = new ArrayList<>();
 	
 	private float time = 0.f, frameDt = 0.f;
@@ -63,55 +63,55 @@ public class Solver
 			}
 			
 			// obj-line
-			for (Line line : this.lines)
+			for (LineObject lineObj : this.lineObjects)
 			{
-				if (obj1 == line.obj1 || obj1 == line.obj2)
+				if (obj1 == lineObj.obj1 || obj1 == lineObj.obj2)
 					continue;
 				
-				Vector2f local = obj1.position.sub(line.obj1.position, new Vector2f());
-				final float distAlongLine = local.dot(line.getTangent());
+				Vector2f local = obj1.position.sub(lineObj.obj1.position, new Vector2f());
+				final float distAlongLine = local.dot(lineObj.getTangent());
 				
 				// Default to along the line
-				Vector2f normal = line.getNormal();
+				Vector2f normal = lineObj.getNormal();
 				float distAwayFromLine = local.dot(normal);
 				if (distAwayFromLine < 0.f)
 					normal.negate();
 				distAwayFromLine = Math.abs(distAwayFromLine);
 				
 				// Check if ball is colliding with line end
-				if (distAlongLine < 0.f || distAlongLine > line.getLength())
+				if (distAlongLine < 0.f || distAlongLine > lineObj.getLength())
 				{
 					// Check what end the obj is colliding with
 					if (distAlongLine < 0.f)
-						obj1.position.sub(line.obj1.position, normal).normalize();
+						obj1.position.sub(lineObj.obj1.position, normal).normalize();
 					else
 					{
-						obj1.position.sub(line.obj2.position, local);
+						obj1.position.sub(lineObj.obj2.position, local);
 						local.normalize(normal);
 					}
 					distAwayFromLine = Math.abs(local.dot(normal));
 				}
 				
-				final float minDist = line.thickness * .5f + obj1.radius;
+				final float minDist = lineObj.thickness * .5f + obj1.radius;
 				if (distAwayFromLine < minDist)
 				{
-					final float totalMass = obj1.radius + line.obj1.radius + line.obj2.radius;
+					final float totalMass = obj1.radius + lineObj.obj1.radius + lineObj.obj2.radius;
 					final float massRatioObj = obj1.radius / totalMass;
-					final float massRatioL1 = line.obj1.radius / totalMass;
-					final float massRatioL2 = line.obj2.radius / totalMass;
+					final float massRatioL1 = lineObj.obj1.radius / totalMass;
+					final float massRatioL2 = lineObj.obj2.radius / totalMass;
 					
-					final float p = distAlongLine / line.getLength();
-					final float elasticityP = line.obj1.elasticity * (1.f - p) + line.obj2.elasticity * p;
+					final float p = distAlongLine / lineObj.getLength();
+					final float elasticityP = lineObj.obj1.elasticity * (1.f - p) + lineObj.obj2.elasticity * p;
 					final float massRatioP = massRatioL1 * (1.f - p) + massRatioL2 * p;
 					
 					final float force = (1.f / 3.f) * ((obj1.elasticity + elasticityP) * .5f) * (distAwayFromLine - minDist);
 					
 					if (!obj1.fixed)
 						obj1.position.sub(normal.mul(massRatioP * force, new Vector2f()));
-					if (!line.obj1.fixed)
-						line.obj1.position.add(normal.mul(massRatioObj * force * (1.f - p), new Vector2f()));
-					if (!line.obj2.fixed)
-						line.obj2.position.add(normal.mul(massRatioObj * force * p, new Vector2f()));
+					if (!lineObj.obj1.fixed)
+						lineObj.obj1.position.add(normal.mul(massRatioObj * force * (1.f - p), new Vector2f()));
+					if (!lineObj.obj2.fixed)
+						lineObj.obj2.position.add(normal.mul(massRatioObj * force * p, new Vector2f()));
 				}
 			}
 		}
@@ -188,14 +188,14 @@ public class Solver
 		return this.objects.size();
 	}
 	
-	public boolean addLine(Line line)
+	public boolean addLineObj(LineObject lineObj)
 	{
-		return this.lines.add(line);
+		return this.lineObjects.add(lineObj);
 	}
 	
 	public int getLineCount()
 	{
-		return this.lines.size();
+		return this.lineObjects.size();
 	}
 	
 	public boolean addConstraint(Constraint constraint)
@@ -225,8 +225,8 @@ public class Solver
 		for (Constraint constraint : this.constraints)
 			constraint.render(shapeRenderer, lineRenderer);
 		
-		for (Line line : this.lines)
-			line.render(shapeRenderer, lineRenderer);
+		for (LineObject lineObj : this.lineObjects)
+			lineObj.render(shapeRenderer, lineRenderer);
 		
 		for (VerletObject obj : this.objects)
 			obj.render(this.frameDt, shapeRenderer, lineRenderer);
@@ -240,7 +240,7 @@ public class Solver
 	public void gui(float windowWidth)
 	{
 		ImGui.text(String.format("Objects: %d", this.objects.size()));
-		ImGui.text(String.format("Lines: %d", this.lines.size()));
+		ImGui.text(String.format("Lines: %d", this.lineObjects.size()));
 		ImGui.text(String.format("Time elapsed: %f", this.time));
 		ImGui.text(String.format("Sub steps: %d", this.subSteps));
 		ImGui.text(String.format("Frame dt: %f", this.frameDt));
