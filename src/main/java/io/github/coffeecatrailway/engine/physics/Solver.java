@@ -4,6 +4,7 @@ import imgui.ImGui;
 import io.github.coffeecatrailway.catbox.RandUtil;
 import io.github.coffeecatrailway.engine.physics.object.Line;
 import io.github.coffeecatrailway.engine.physics.object.VerletObject;
+import io.github.coffeecatrailway.engine.physics.object.constraint.Constraint;
 import io.github.coffeecatrailway.engine.renderer.LineRenderer;
 import io.github.coffeecatrailway.engine.renderer.ShapeRenderer;
 import org.joml.Math;
@@ -22,6 +23,7 @@ public class Solver
 	
 	private final ArrayList<VerletObject> objects = new ArrayList<>();
 	private final ArrayList<Line> lines = new ArrayList<>();
+	private final ArrayList<Constraint> constraints = new ArrayList<>();
 	
 	private float time = 0.f, frameDt = 0.f;
 	
@@ -146,7 +148,11 @@ public class Solver
 		{
 			this.applyGravity();
 			this.checkCollisions(stepDt);
+			
 			this.applyConstraint(stepDt);
+			for (Constraint constraint : this.constraints)
+				constraint.update(stepDt);
+			
 			this.updateObjects(stepDt);
 		}
 	}
@@ -192,6 +198,16 @@ public class Solver
 		return this.lines.size();
 	}
 	
+	public boolean addConstraint(Constraint constraint)
+	{
+		return this.constraints.add(constraint);
+	}
+	
+	public int getConstraintCount()
+	{
+		return this.constraints.size();
+	}
+	
 	public float getStepDt()
 	{
 		return this.frameDt / (float) this.subSteps;
@@ -205,6 +221,9 @@ public class Solver
 	public void render(ShapeRenderer shapeRenderer, LineRenderer lineRenderer)
 	{
 		shapeRenderer.pushCircle(this.constraintCenter, new Vector3f(0.1f), this.constraintRadius, 0.f);
+		
+		for (Constraint constraint : this.constraints)
+			constraint.render(shapeRenderer, lineRenderer);
 		
 		for (Line line : this.lines)
 			line.render(shapeRenderer, lineRenderer);

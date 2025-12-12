@@ -4,6 +4,7 @@ import imgui.ImGui;
 import io.github.coffeecatrailway.engine.physics.Solver;
 import io.github.coffeecatrailway.engine.physics.object.Line;
 import io.github.coffeecatrailway.engine.physics.object.VerletObject;
+import io.github.coffeecatrailway.engine.physics.object.constraint.DistanceConstraint;
 import io.github.coffeecatrailway.engine.renderer.LineRenderer;
 import io.github.coffeecatrailway.engine.renderer.ShapeRenderer;
 import io.github.coffeecatrailway.engine.renderer.window.ImGUIWrapper;
@@ -79,25 +80,29 @@ public class Main
 		
 		this.solver.gravity.set(0.f);
 		
-		VerletObject obj1 = new VerletObject(new Vector2f(100.f), 20.f);
-		this.solver.addObject(obj1);
-//		obj1.fixed = true;
-		obj1.setVelocity(new Vector2f(0.f , -200.f), this.solver.getStepDt());
+//		VerletObject obj1 = new VerletObject(new Vector2f(100.f), 20.f);
+//		this.solver.addObject(obj1);
+//		obj1.setVelocity(new Vector2f(0.f , -200.f), this.solver.getStepDt());
 		
-		VerletObject obj2 = new VerletObject(new Vector2f(-100.f), 20.f);
-		this.solver.addObject(obj2);
+//		VerletObject obj2 = new VerletObject(new Vector2f(-100.f), 20.f);
+//		this.solver.addObject(obj2);
 //		obj2.setVelocity(new Vector2f(0.f , 200.f), this.solver.getStepDt());
 		
 		VerletObject lo1 = new VerletObject(new Vector2f(-200.f, 0.f), 10.f);
 //		lo1.fixed = true;
 		this.solver.addObject(lo1);
 //		lo1.setVelocity(new Vector2f(0.f, 200.f), this.solver.getStepDt());
+		
 		VerletObject lo2 = new VerletObject(new Vector2f(200.f, 0.f), 10.f);
 //		lo2.fixed = true;
 		this.solver.addObject(lo2);
 //		lo2.setVelocity(new Vector2f(0.f, 200.f), this.solver.getStepDt());
+		
 		Line line = new Line(lo1, lo2, 20.f);
 		this.solver.addLine(line);
+		
+		DistanceConstraint distConstraint = new DistanceConstraint(lo1, lo2);
+		this.solver.addConstraint(distConstraint);
 	}
 	
 	private void updateTransform(float aspect)
@@ -125,18 +130,19 @@ public class Main
 	
 	private void fixedUpdate(float dt)
 	{
-//		if (this.solver.getObjectCount() < 1000 && (this.fixedFrameCount % 5) == 0)
-//		{
-//			final float radius = RandUtil.getRange(2.f, 15.f);
-//			Vector2f velocity = new Vector2f(500.f * Math.sin(this.solver.getTime()), -400.f);
-//
-//			VerletObject obj = new VerletObject(new Vector2f(0.f, this.worldView * .75f), radius);
-//			obj.color = this.getRainbow(this.solver.getTime());
-//			obj.elasticity = .5f;
-//
-//			this.solver.addObject(obj);
+		if (this.solver.getObjectCount() < 1000 && (this.fixedFrameCount % 5) == 0)
+		{
+			final float radius = RandUtil.getRange(2.f, 15.f);
+			Vector2f velocity = new Vector2f(500.f * Math.sin(this.solver.getTime()), -400.f);
+
+			VerletObject obj = new VerletObject(new Vector2f(0.f, this.worldView * .75f), radius);
+			obj.color = this.getRainbow(this.solver.getTime());
+			obj.elasticity = .5f;
+			obj.setVelocity(velocity, this.solver.getStepDt());
+
+			this.solver.addObject(obj);
 //			this.solver.setObjectVelocity(obj, velocity);
-//		}
+		}
 		
 		this.solver.update(dt);
 	}
