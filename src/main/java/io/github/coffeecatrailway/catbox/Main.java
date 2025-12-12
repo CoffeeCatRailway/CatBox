@@ -88,21 +88,43 @@ public class Main
 //		this.solver.addObject(obj2);
 //		obj2.setVelocity(new Vector2f(0.f , 200.f), this.solver.getStepDt());
 		
-		VerletObject lo1 = new VerletObject(new Vector2f(-200.f, 0.f), 10.f);
-//		lo1.fixed = true;
-		this.solver.addObject(lo1);
-//		lo1.setVelocity(new Vector2f(0.f, 200.f), this.solver.getStepDt());
+//		VerletObject lo1 = new VerletObject(new Vector2f(-200.f, 0.f), 10.f);
+////		lo1.fixed = true;
+//		this.solver.addObject(lo1);
+////		lo1.setVelocity(new Vector2f(0.f, 200.f), this.solver.getStepDt());
+//
+//		VerletObject lo2 = new VerletObject(new Vector2f(200.f, 0.f), 10.f);
+////		lo2.fixed = true;
+//		this.solver.addObject(lo2);
+////		lo2.setVelocity(new Vector2f(0.f, 200.f), this.solver.getStepDt());
+//
+//		Line line = new Line(lo1, lo2, 20.f);
+//		this.solver.addLine(line);
+//
+//		DistanceConstraint distConstraint = new DistanceConstraint(lo1, lo2);
+//		this.solver.addConstraint(distConstraint);
 		
-		VerletObject lo2 = new VerletObject(new Vector2f(200.f, 0.f), 10.f);
-//		lo2.fixed = true;
-		this.solver.addObject(lo2);
-//		lo2.setVelocity(new Vector2f(0.f, 200.f), this.solver.getStepDt());
-		
-		Line line = new Line(lo1, lo2, 20.f);
-		this.solver.addLine(line);
-		
-		DistanceConstraint distConstraint = new DistanceConstraint(lo1, lo2);
-		this.solver.addConstraint(distConstraint);
+		VerletObject chainObjLast = new VerletObject(new Vector2f(-165.f, 0.f), 10.f);
+		chainObjLast.position.x += 10.f;
+		chainObjLast.elasticity = .75f;
+		chainObjLast.fixed = true;
+		this.solver.addObject(chainObjLast);
+		for (int i = 0; i < 10; i++)
+		{
+			VerletObject chainObj = new VerletObject(new Vector2f(-165.f + 30.f * (i + 1.f), 0.f), 10.f);
+			chainObj.elasticity = .75f;
+			this.solver.addObject(chainObj);
+			
+			Line lineObj = new Line(chainObjLast, chainObj);
+			this.solver.addLine(lineObj);
+			
+			DistanceConstraint constraint = new DistanceConstraint(chainObjLast, chainObj, 30.f);
+			this.solver.addConstraint(constraint);
+			
+			chainObjLast = chainObj;
+		}
+		chainObjLast.position.x -= 10.f;
+		chainObjLast.fixed = true;
 	}
 	
 	private void updateTransform(float aspect)
