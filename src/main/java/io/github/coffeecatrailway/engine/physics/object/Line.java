@@ -13,7 +13,7 @@ public class Line
 	
 	public Line(VerletObject obj1, VerletObject obj2)
 	{
-		this(obj1, obj2, 1.f);
+		this(obj1, obj2, obj1.radius * 2.f);
 	}
 	
 	public Line(VerletObject obj1, VerletObject obj2, float thickness)
