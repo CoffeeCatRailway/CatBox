@@ -7,7 +7,6 @@ import io.github.coffeecatrailway.engine.physics.object.VerletObject;
 import io.github.coffeecatrailway.engine.physics.object.constraint.Constraint;
 import io.github.coffeecatrailway.engine.renderer.LineRenderer;
 import io.github.coffeecatrailway.engine.renderer.ShapeRenderer;
-import org.joml.Math;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 
@@ -15,17 +14,44 @@ import java.util.ArrayList;
 
 public class Solver
 {
-	private int subSteps = 1;
+	private int subSteps = 8;
 	public final Vector2f gravity = new Vector2f(0.f);
 	
-	private final Vector2f constraintCenter = new Vector2f(0.f);
-	private float constraintRadius = 100.f;
+	private final Vector2f worldCenter = new Vector2f(0.f);
+	private final Vector2f worldSize = new Vector2f(100.f);
 	
 	private final ArrayList<VerletObject> objects = new ArrayList<>();
 	private final ArrayList<LineObject> lineObjects = new ArrayList<>();
 	private final ArrayList<Constraint> constraints = new ArrayList<>();
 	
-	private float time = 0.f, frameDt = 0.f;
+	private float time = 0.f, frameDt = 1.f / 60.f;
+	
+	public Solver(float worldWidth, float worldHeight)
+	{
+		this.worldSize.set(worldWidth, worldHeight);
+	}
+	
+	private void solveObjectObjectContact(VerletObject obj1, VerletObject obj2)
+	{
+		Vector2f dir = obj1.position.sub(obj2.position, new Vector2f());
+		final float dist = dir.length();
+		final float minDist = obj1.radius + obj2.radius;
+		if (dist < minDist)
+		{
+			dir.normalize();
+			if (Math.signum(dist) == 0)
+				dir.set(RandUtil.getVec2f());
+			
+			final float massRatio1 = obj1.radius / minDist;
+			final float massRatio2 = obj2.radius / minDist;
+			final float force = .5f * ((obj1.elasticity + obj2.elasticity) * .5f) * (dist - minDist);
+			
+			if (!obj1.fixed)
+				obj1.position.sub(dir.mul(massRatio2 * force, new Vector2f()));
+			if (!obj2.fixed)
+				obj2.position.add(dir.mul(massRatio1 * force, new Vector2f()));
+		}
+	}
 
 	private void checkCollisions(float dt)
 	{
@@ -34,44 +60,24 @@ public class Solver
 			VerletObject obj1 = this.objects.get(i);
 			// obj-obj
 			for (int j = i + 1; j < this.objects.size(); j++)
-			{
-				VerletObject obj2 = this.objects.get(j);
-				Vector2f dir = obj1.position.sub(obj2.position, new Vector2f());
-				final float dist = dir.length();
-				final float minDist = obj1.radius + obj2.radius;
-				if (dist < minDist)
-				{
-					dir.normalize();
-					if (Math.signum(dist) == 0)
-						dir.set(RandUtil.getVec2f());
-					
-					final float massRatio1 = obj1.radius / minDist;
-					final float massRatio2 = obj2.radius / minDist;
-					final float force = .5f * ((obj1.elasticity + obj2.elasticity) * .5f) * (dist - minDist);
+				this.solveObjectObjectContact(obj1, this.objects.get(j));
 
-					if (!obj1.fixed)
-						obj1.position.sub(dir.mul(massRatio2 * force, new Vector2f()));
-					if (!obj2.fixed)
-						obj2.position.add(dir.mul(massRatio1 * force, new Vector2f()));
-				}
-			}
-			
 			// obj-line
 			for (LineObject lineObj : this.lineObjects)
 			{
 				if (obj1 == lineObj.obj1 || obj1 == lineObj.obj2)
 					continue;
-				
+
 				Vector2f local = obj1.position.sub(lineObj.obj1.position, new Vector2f());
 				final float distAlongLine = local.dot(lineObj.getTangent());
-				
+
 				// Default to along the line
 				Vector2f normal = lineObj.getNormal();
 				float distAwayFromLine = local.dot(normal);
 				if (distAwayFromLine < 0.f)
 					normal.negate();
 				distAwayFromLine = Math.abs(distAwayFromLine);
-				
+
 				// Check if ball is colliding with line end
 				if (distAlongLine < 0.f || distAlongLine > lineObj.getLength())
 				{
@@ -85,7 +91,7 @@ public class Solver
 					}
 					distAwayFromLine = Math.abs(local.dot(normal));
 				}
-				
+
 				final float minDist = lineObj.thickness * .5f + obj1.radius;
 				if (distAwayFromLine < minDist)
 				{
@@ -93,13 +99,13 @@ public class Solver
 					final float massRatioObj = obj1.radius / totalMass;
 					final float massRatioL1 = lineObj.obj1.radius / totalMass;
 					final float massRatioL2 = lineObj.obj2.radius / totalMass;
-					
+
 					final float p = distAlongLine / lineObj.getLength();
 					final float elasticityP = lineObj.obj1.elasticity * (1.f - p) + lineObj.obj2.elasticity * p;
 					final float massRatioP = massRatioL1 * (1.f - p) + massRatioL2 * p;
-					
+
 					final float force = (1.f / 3.f) * ((obj1.elasticity + elasticityP) * .5f) * (distAwayFromLine - minDist);
-					
+
 					if (!obj1.fixed)
 						obj1.position.sub(normal.mul(massRatioP * force, new Vector2f()));
 					if (!lineObj.obj1.fixed)
@@ -111,18 +117,30 @@ public class Solver
 		}
 	}
 	
-	private void applyConstraint(VerletObject obj)
+	private void applyWorldConstraint(VerletObject obj)
 	{
-		Vector2f dir = this.constraintCenter.sub(obj.position, new Vector2f());
-		final float dist = dir.length();
-		if (dist > this.constraintRadius - obj.radius)
-		{
-			dir.normalize();
-			this.constraintCenter.sub(dir.mul(this.constraintRadius - obj.radius), obj.position);
-			
-//				final float force = .5f * obj.elasticity * (this.constraintRadius - (this.constraintRadius - obj.radius));
-//				obj.position.add(dir.mul(force / obj.radius));
-		}
+//		Vector2f dir = this.constraintCenter.sub(obj.position, new Vector2f());
+//		final float dist = dir.length();
+//		if (dist > this.constraintRadius - obj.radius)
+//		{
+//			dir.normalize();
+//			this.constraintCenter.sub(dir.mul(this.constraintRadius - obj.radius), obj.position);
+//
+////				final float force = .5f * obj.elasticity * (this.constraintRadius - (this.constraintRadius - obj.radius));
+////				obj.position.add(dir.mul(force / obj.radius));
+//		}
+
+		final float halfWidth = this.worldSize.x * .5f;
+		if (obj.position.x < -halfWidth + obj.radius)
+			obj.position.x = -halfWidth + obj.radius;
+		else if (obj.position.x > halfWidth - obj.radius)
+			obj.position.x = halfWidth - obj.radius;
+		
+		final float halfHeight = this.worldSize.y * .5f;
+		if (obj.position.y < -halfHeight + obj.radius)
+			obj.position.y = -halfHeight + obj.radius;
+		else if (obj.position.y > halfHeight - obj.radius)
+			obj.position.y = halfHeight - obj.radius;
 	}
 	
 	private void updateObjects(float dt)
@@ -131,7 +149,7 @@ public class Solver
 		{
 			obj.accelerate(this.gravity);
 			obj.update(dt);
-			this.applyConstraint(obj);
+			this.applyWorldConstraint(obj);
 		}
 	}
 	
@@ -155,10 +173,10 @@ public class Solver
 		this.frameDt = 1.f / (float) rate;
 	}
 	
-	public void setConstraint(Vector2f pos, float radius)
+	public void setWorldConstraint(Vector2f pos, float width, float height)
 	{
-		this.constraintCenter.set(pos);
-		this.constraintRadius = radius;
+		this.worldCenter.set(pos);
+		this.worldSize.set(width, height);
 	}
 	
 	public void setSubSteps(int subSteps)
@@ -175,11 +193,6 @@ public class Solver
 	{
 		return this.objects.get(i);
 	}
-	
-//	public void setObjectVelocity(VerletObject obj, Vector2f velocity)
-//	{
-//		obj.setVelocity(velocity, this.getStepDt());
-//	}
 	
 	public int getObjectCount()
 	{
@@ -218,7 +231,8 @@ public class Solver
 	
 	public void render(ShapeRenderer shapeRenderer, LineRenderer lineRenderer)
 	{
-		shapeRenderer.pushCircle(this.constraintCenter, new Vector3f(0.15f), this.constraintRadius, 0.f);
+//		shapeRenderer.pushCircle(this.constraintCenter, new Vector3f(0.15f), this.constraintRadius, 0.f);
+		shapeRenderer.pushBox(this.worldCenter, new Vector3f(.15f), this.worldSize, 0.f, 0.f);
 		
 		for (Constraint constraint : this.constraints)
 			constraint.render(shapeRenderer, lineRenderer);

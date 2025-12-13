@@ -36,7 +36,7 @@ public class Main
 	
 	// Options
 	private boolean vSync = false, pauseFixed = true, btnStepFixed = false;
-	private final float worldView = 600.f;
+	private final Vector2f worldSize = new Vector2f(1200.f);
 	
 	private final float[] backgroundColor = {
 			// 0.f, 0.f, 0.f
@@ -74,8 +74,8 @@ public class Main
 		this.lineRenderer = new LineRenderer(10);
 		this.lineRenderer.init();
 		
-		this.solver = new Solver();
-		this.solver.setConstraint(new Vector2f(0.f), this.worldView * 1.4f);
+		this.solver = new Solver(this.worldSize.x, this.worldSize.y);
+//		this.solver.setConstraint(new Vector2f(0.f), this.worldView);// * 1.4f
 		this.solver.setSubSteps(8);
 		this.solver.setTps(this.ticksPerSecond);
 		
@@ -129,22 +129,22 @@ public class Main
 //		this.addCube(new Vector2f(0.f, -100.f), new Vector3f(.5f), 100.f, 100.f, 10.f, .5f);
 //		this.addCube(new Vector2f(200.f, -100.f), new Vector3f(.25f), 100.f, 100.f, 10.f, .25f);
 		
-		this.addCube(new Vector2f(0.f, -300.f), new Vector3f(1.f), this.worldView * 2.f, 300.f, 10.f, 2.f);
+		this.addCube(new Vector2f(0.f, -300.f), new Vector3f(1.f), this.worldSize.x * .45f * 2.f, 300.f, 10.f, 2.f);
 
-		VerletObject wo1 = new VerletObject(new Vector2f(-this.worldView - 20.f, -500.f), 10.f);
+		VerletObject wo1 = new VerletObject(new Vector2f(-this.worldSize.x * .45f - 20.f, -500.f), 10.f);
 		wo1.fixed = true;
 		this.solver.addObject(wo1);
-		VerletObject wo2 = new VerletObject(new Vector2f(-this.worldView - 20.f, 300.f), 10.f);
+		VerletObject wo2 = new VerletObject(new Vector2f(-this.worldSize.x * .45f - 20.f, 300.f), 10.f);
 		wo2.fixed = true;
 		this.solver.addObject(wo2);
 
 		LineObject wl1 = new LineObject(wo1, wo2);
 		this.solver.addLineObj(wl1);
 
-		VerletObject wo3 = new VerletObject(new Vector2f(this.worldView + 20.f, -500.f), 10.f);
+		VerletObject wo3 = new VerletObject(new Vector2f(this.worldSize.x * .45f + 20.f, -500.f), 10.f);
 		wo3.fixed = true;
 		this.solver.addObject(wo3);
-		VerletObject wo4 = new VerletObject(new Vector2f(this.worldView + 20.f, 300.f), 10.f);
+		VerletObject wo4 = new VerletObject(new Vector2f(this.worldSize.x * .45f + 20.f, 300.f), 10.f);
 		wo4.fixed = true;
 		this.solver.addObject(wo4);
 
@@ -197,10 +197,10 @@ public class Main
 	private void updateTransform(float aspect)
 	{
 		boolean aspectOne = aspect >= 1.f;
-		float left = -this.worldView * (aspectOne ? aspect : 1.f);
-		float right = this.worldView * (aspectOne ? aspect : 1.f);
-		float bottom = -this.worldView / (aspectOne ? 1.f : aspect);
-		float top = this.worldView / (aspectOne ? 1.f : aspect);
+		float left = -this.worldSize.x * .5f * (aspectOne ? aspect : 1.f);
+		float right = this.worldSize.x * .5f * (aspectOne ? aspect : 1.f);
+		float bottom = -this.worldSize.y * .5f / (aspectOne ? 1.f : aspect);
+		float top = this.worldSize.y * .5f / (aspectOne ? 1.f : aspect);
 		this.transformMatrix.setOrtho(left, right, bottom, top, -1.f, 1.f);
 	}
 	
@@ -222,10 +222,13 @@ public class Main
 		if (this.solver.getObjectCount() < 1500 && (this.fixedFrameCount % 5) == 0)
 		{
 			final float radius = RandUtil.getRange(2.f, 15.f);
-			Vector2f velocity = new Vector2f(500.f * Math.sin(this.solver.getTime()), -400.f);
-
-			VerletObject obj = new VerletObject(new Vector2f(0.f, this.worldView * .75f), radius);
-			obj.color = this.getRainbow(this.solver.getTime() * 2.f);
+			
+			Vector2f velocity = new Vector2f(400.f, 0.f);
+			VerletObject obj = new VerletObject(new Vector2f(-this.worldSize.y * .5f * .95f, this.worldSize.y * .5f * .75f), radius);
+//			Vector2f velocity = new Vector2f(500.f * Math.sin(this.solver.getTime()), -400.f);
+//			VerletObject obj = new VerletObject(new Vector2f(0.f, this.worldSize.y * .5f * .75f), radius);
+			
+			obj.color = this.getRainbow(this.solver.getTime());
 			obj.elasticity = .5f;
 			obj.setVelocity(velocity, this.solver.getStepDt());
 
@@ -251,7 +254,7 @@ public class Main
 		{
 			windowWidth = ImGui.getWindowWidth();
 			ImGui.text(String.format("FPS: %f\nFrames: %d\tFixed Frames: %d", ImGui.getIO().getFramerate(), this.frameCount, this.fixedFrameCount));
-			ImGui.text(String.format("World view: %.1f", this.worldView));
+			ImGui.text(String.format("World Size: %.1f/%.1f", this.worldSize.x, this.worldSize.y));
 			ImGui.text(String.format("Window size: %d/%d", this.window.getWidth(), this.window.getHeight()));
 			if (ImGui.checkbox("Vsync", this.vSync))
 			{
