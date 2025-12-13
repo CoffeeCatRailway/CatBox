@@ -105,43 +105,68 @@ public class Main
 //		DistanceConstraint distConstraint = new DistanceConstraint(lo1, lo2);
 //		this.solver.addConstraint(distConstraint);
 		
-		VerletObject chainObjLast = new VerletObject(new Vector2f(-165.f, 0.f), 10.f);
-		chainObjLast.elasticity = .75f;
-		chainObjLast.fixed = true;
-		this.solver.addObject(chainObjLast);
-		for (int i = 0; i < 10; i++)
-		{
-			VerletObject chainObj = new VerletObject(new Vector2f(-165.f + 30.f * (i + 1.f), 0.f), 10.f);
-			chainObj.elasticity = .75f;
-			this.solver.addObject(chainObj);
-
-			LineObject lineObj = new LineObject(chainObjLast, chainObj);
-			this.solver.addLineObj(lineObj);
-			
-			SpringConstraint constraint = new SpringConstraint(chainObjLast, chainObj, 40.f, 2.f);
-			this.solver.addConstraint(constraint);
-
-			chainObjLast = chainObj;
-		}
-		chainObjLast.fixed = true;
+//		VerletObject chainObjLast = new VerletObject(new Vector2f(-165.f, 0.f), 10.f);
+//		chainObjLast.elasticity = .75f;
+//		chainObjLast.fixed = true;
+//		this.solver.addObject(chainObjLast);
+//		for (int i = 0; i < 10; i++)
+//		{
+//			VerletObject chainObj = new VerletObject(new Vector2f(-165.f + 30.f * (i + 1.f), 0.f), 10.f);
+//			chainObj.elasticity = .75f;
+//			this.solver.addObject(chainObj);
+//
+//			LineObject lineObj = new LineObject(chainObjLast, chainObj);
+//			this.solver.addLineObj(lineObj);
+//
+//			SpringConstraint constraint = new SpringConstraint(chainObjLast, chainObj, 40.f, 2.f);
+//			this.solver.addConstraint(constraint);
+//
+//			chainObjLast = chainObj;
+//		}
+//		chainObjLast.fixed = true;
 		
-		this.addCube(new Vector2f(-200.f, -100.f), new Vector3f(1.f), 10.f, 1.f);
-		this.addCube(new Vector2f(0.f, -100.f), new Vector3f(.5f), 10.f, .5f);
-		this.addCube(new Vector2f(200.f, -100.f), new Vector3f(.25f), 10.f, .25f);
+//		this.addCube(new Vector2f(-200.f, -100.f), new Vector3f(1.f), 200.f, 100.f, 10.f, 1.f);
+//		this.addCube(new Vector2f(0.f, -100.f), new Vector3f(.5f), 100.f, 100.f, 10.f, .5f);
+//		this.addCube(new Vector2f(200.f, -100.f), new Vector3f(.25f), 100.f, 100.f, 10.f, .25f);
+		
+		this.addCube(new Vector2f(0.f, -300.f), new Vector3f(1.f), this.worldView * 2.f, 300.f, 10.f, 1.5f);
+
+		VerletObject wo1 = new VerletObject(new Vector2f(-this.worldView - 20.f, -500.f), 10.f);
+		wo1.fixed = true;
+		this.solver.addObject(wo1);
+		VerletObject wo2 = new VerletObject(new Vector2f(-this.worldView - 20.f, 300.f), 10.f);
+		wo2.fixed = true;
+		this.solver.addObject(wo2);
+
+		LineObject wl1 = new LineObject(wo1, wo2);
+		this.solver.addLineObj(wl1);
+
+		VerletObject wo3 = new VerletObject(new Vector2f(this.worldView + 20.f, -500.f), 10.f);
+		wo3.fixed = true;
+		this.solver.addObject(wo3);
+		VerletObject wo4 = new VerletObject(new Vector2f(this.worldView + 20.f, 300.f), 10.f);
+		wo4.fixed = true;
+		this.solver.addObject(wo4);
+
+		LineObject wl2 = new LineObject(wo3, wo4);
+		this.solver.addLineObj(wl2);
+
+		LineObject wl3 = new LineObject(wo1, wo3);
+		this.solver.addLineObj(wl3);
 	}
 	
-	private void addCube(Vector2f pos, Vector3f color, float objRadius, float springForce)
+	private void addCube(Vector2f pos, Vector3f color, float width, float height, float objRadius, float springForce)
 	{
-		VerletObject so1 = new VerletObject(new Vector2f(-50.f, -50.f).add(pos), objRadius);
+		VerletObject so1 = new VerletObject(new Vector2f(-width * .5f, -height * .5f).add(pos), objRadius);
 		so1.color = color;
 		this.solver.addObject(so1);
-		VerletObject so2 = new VerletObject(new Vector2f(50.f, -50.f).add(pos), objRadius);
+		VerletObject so2 = new VerletObject(new Vector2f(width * .5f, -height * .5f).add(pos), objRadius);
 		so2.color = color;
 		this.solver.addObject(so2);
-		VerletObject so3 = new VerletObject(new Vector2f(50.f, 50.f).add(pos), objRadius);
+		VerletObject so3 = new VerletObject(new Vector2f(width * .5f, height * .5f).add(pos), objRadius);
 		so3.color = color;
 		this.solver.addObject(so3);
-		VerletObject so4 = new VerletObject(new Vector2f(-50.f, 50.f).add(pos), objRadius);
+		VerletObject so4 = new VerletObject(new Vector2f(-width * .5f, height * .5f).add(pos), objRadius);
 		so4.color = color;
 		this.solver.addObject(so4);
 		

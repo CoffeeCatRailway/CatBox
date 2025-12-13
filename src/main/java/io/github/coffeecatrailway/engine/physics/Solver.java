@@ -178,6 +178,11 @@ public class Solver
 		return this.objects.add(obj);
 	}
 	
+	public VerletObject getObjectByIndex(int i)
+	{
+		return this.objects.get(i);
+	}
+	
 //	public void setObjectVelocity(VerletObject obj, Vector2f velocity)
 //	{
 //		obj.setVelocity(velocity, this.getStepDt());
