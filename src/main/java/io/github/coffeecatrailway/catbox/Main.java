@@ -75,7 +75,7 @@ public class Main
 		this.lineRenderer.init();
 		
 		this.solver = new Solver();
-		this.solver.setConstraint(new Vector2f(0.f), this.worldView);
+		this.solver.setConstraint(new Vector2f(0.f), this.worldView * 1.4f);
 		this.solver.setSubSteps(8);
 		this.solver.setTps(this.ticksPerSecond);
 		
@@ -129,7 +129,7 @@ public class Main
 //		this.addCube(new Vector2f(0.f, -100.f), new Vector3f(.5f), 100.f, 100.f, 10.f, .5f);
 //		this.addCube(new Vector2f(200.f, -100.f), new Vector3f(.25f), 100.f, 100.f, 10.f, .25f);
 		
-		this.addCube(new Vector2f(0.f, -300.f), new Vector3f(1.f), this.worldView * 2.f, 300.f, 10.f, 1.5f);
+		this.addCube(new Vector2f(0.f, -300.f), new Vector3f(1.f), this.worldView * 2.f, 300.f, 10.f, 2.f);
 
 		VerletObject wo1 = new VerletObject(new Vector2f(-this.worldView - 20.f, -500.f), 10.f);
 		wo1.fixed = true;
@@ -219,13 +219,13 @@ public class Main
 	
 	private void fixedUpdate(float dt)
 	{
-		if (this.solver.getObjectCount() < 1000 && (this.fixedFrameCount % 5) == 0)
+		if (this.solver.getObjectCount() < 1500 && (this.fixedFrameCount % 5) == 0)
 		{
 			final float radius = RandUtil.getRange(2.f, 15.f);
 			Vector2f velocity = new Vector2f(500.f * Math.sin(this.solver.getTime()), -400.f);
 
 			VerletObject obj = new VerletObject(new Vector2f(0.f, this.worldView * .75f), radius);
-			obj.color = this.getRainbow(this.solver.getTime());
+			obj.color = this.getRainbow(this.solver.getTime() * 2.f);
 			obj.elasticity = .5f;
 			obj.setVelocity(velocity, this.solver.getStepDt());
 

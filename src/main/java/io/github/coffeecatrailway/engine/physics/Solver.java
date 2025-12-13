@@ -26,12 +26,6 @@ public class Solver
 	private final ArrayList<Constraint> constraints = new ArrayList<>();
 	
 	private float time = 0.f, frameDt = 0.f;
-	
-	private void applyGravity()
-	{
-		for (VerletObject obj : this.objects)
-			obj.accelerate(this.gravity);
-	}
 
 	private void checkCollisions(float dt)
 	{
@@ -117,27 +111,28 @@ public class Solver
 		}
 	}
 	
-	private void applyConstraint(float dt)
+	private void applyConstraint(VerletObject obj)
 	{
-		for (VerletObject obj : this.objects)
+		Vector2f dir = this.constraintCenter.sub(obj.position, new Vector2f());
+		final float dist = dir.length();
+		if (dist > this.constraintRadius - obj.radius)
 		{
-			Vector2f dir = this.constraintCenter.sub(obj.position, new Vector2f());
-			final float dist = dir.length();
-			if (dist > this.constraintRadius - obj.radius)
-			{
-				dir.normalize();
-				this.constraintCenter.sub(dir.mul(this.constraintRadius - obj.radius), obj.position);
-				
+			dir.normalize();
+			this.constraintCenter.sub(dir.mul(this.constraintRadius - obj.radius), obj.position);
+			
 //				final float force = .5f * obj.elasticity * (this.constraintRadius - (this.constraintRadius - obj.radius));
 //				obj.position.add(dir.mul(force / obj.radius));
-			}
 		}
 	}
 	
 	private void updateObjects(float dt)
 	{
 		for (VerletObject obj : this.objects)
+		{
+			obj.accelerate(this.gravity);
 			obj.update(dt);
+			this.applyConstraint(obj);
+		}
 	}
 	
 	public void update(float dt)
@@ -146,10 +141,8 @@ public class Solver
 		final float stepDt = this.getStepDt();
 		for (int i = 0; i < this.subSteps; i++)
 		{
-			this.applyGravity();
 			this.checkCollisions(stepDt);
 			
-			this.applyConstraint(stepDt);
 			for (Constraint constraint : this.constraints)
 				constraint.update(stepDt);
 			
