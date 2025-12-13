@@ -16,7 +16,7 @@ import java.util.ArrayList;
 public class Solver
 {
 	private int subSteps = 1;
-	public final Vector2f gravity = new Vector2f(0.f, -200.f);
+	public final Vector2f gravity = new Vector2f(0.f);
 	
 	private final Vector2f constraintCenter = new Vector2f(0.f);
 	private float constraintRadius = 100.f;

@@ -79,7 +79,7 @@ public class Main
 		this.solver.setSubSteps(8);
 		this.solver.setTps(this.ticksPerSecond);
 		
-		this.solver.gravity.set(0.f);
+		this.solver.gravity.set(0.f, -400.f);
 		
 //		VerletObject obj1 = new VerletObject(new Vector2f(100.f), 20.f);
 //		this.solver.addObject(obj1);
@@ -105,29 +105,29 @@ public class Main
 //		DistanceConstraint distConstraint = new DistanceConstraint(lo1, lo2);
 //		this.solver.addConstraint(distConstraint);
 		
-//		VerletObject chainObjLast = new VerletObject(new Vector2f(-165.f, 0.f), 10.f);
-//		chainObjLast.elasticity = .75f;
-//		chainObjLast.fixed = true;
-//		this.solver.addObject(chainObjLast);
-//		for (int i = 0; i < 10; i++)
-//		{
-//			VerletObject chainObj = new VerletObject(new Vector2f(-165.f + 30.f * (i + 1.f), 0.f), 10.f);
-//			chainObj.elasticity = .75f;
-//			this.solver.addObject(chainObj);
-//
-//			LineObject lineObj = new LineObject(chainObjLast, chainObj);
-//			this.solver.addLineObj(lineObj);
-//
-//			DistanceConstraint constraint = new DistanceConstraint(chainObjLast, chainObj, 40.f);
-//			this.solver.addConstraint(constraint);
-//
-//			chainObjLast = chainObj;
-//		}
-//		chainObjLast.fixed = true;
+		VerletObject chainObjLast = new VerletObject(new Vector2f(-165.f, 0.f), 10.f);
+		chainObjLast.elasticity = .75f;
+		chainObjLast.fixed = true;
+		this.solver.addObject(chainObjLast);
+		for (int i = 0; i < 10; i++)
+		{
+			VerletObject chainObj = new VerletObject(new Vector2f(-165.f + 30.f * (i + 1.f), 0.f), 10.f);
+			chainObj.elasticity = .75f;
+			this.solver.addObject(chainObj);
+
+			LineObject lineObj = new LineObject(chainObjLast, chainObj);
+			this.solver.addLineObj(lineObj);
+			
+			SpringConstraint constraint = new SpringConstraint(chainObjLast, chainObj, 40.f, 2.f);
+			this.solver.addConstraint(constraint);
+
+			chainObjLast = chainObj;
+		}
+		chainObjLast.fixed = true;
 		
-		this.addCube(new Vector2f(-200.f, 0.f), new Vector3f(1.f), 10.f, 1.f);
-		this.addCube(new Vector2f(0.f, 0.f), new Vector3f(.5f), 10.f, .5f);
-		this.addCube(new Vector2f(200.f, 0.f), new Vector3f(.25f), 10.f, .25f);
+		this.addCube(new Vector2f(-200.f, -100.f), new Vector3f(1.f), 10.f, 1.f);
+		this.addCube(new Vector2f(0.f, -100.f), new Vector3f(.5f), 10.f, .5f);
+		this.addCube(new Vector2f(200.f, -100.f), new Vector3f(.25f), 10.f, .25f);
 	}
 	
 	private void addCube(Vector2f pos, Vector3f color, float objRadius, float springForce)
