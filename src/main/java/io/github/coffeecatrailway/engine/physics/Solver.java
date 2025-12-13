@@ -138,6 +138,7 @@ public class Solver
 		
 		final float halfHeight = this.worldSize.y * .5f;
 		if (obj.position.y < -halfHeight + obj.radius)
+//			obj.position.y -= (Math.abs(-halfHeight + obj.radius) - Math.abs(obj.position.y)) * obj.elasticity;
 			obj.position.y = -halfHeight + obj.radius;
 		else if (obj.position.y > halfHeight - obj.radius)
 			obj.position.y = halfHeight - obj.radius;

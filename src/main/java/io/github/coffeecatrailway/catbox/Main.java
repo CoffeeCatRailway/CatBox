@@ -125,34 +125,34 @@ public class Main
 //		}
 //		chainObjLast.fixed = true;
 		
-//		this.addCube(new Vector2f(-200.f, -100.f), new Vector3f(1.f), 200.f, 100.f, 10.f, 1.f);
-//		this.addCube(new Vector2f(0.f, -100.f), new Vector3f(.5f), 100.f, 100.f, 10.f, .5f);
-//		this.addCube(new Vector2f(200.f, -100.f), new Vector3f(.25f), 100.f, 100.f, 10.f, .25f);
+		this.addCube(new Vector2f(-200.f, -100.f), new Vector3f(1.f), 200.f, 100.f, 10.f, 1.f);
+		this.addCube(new Vector2f(0.f, -100.f), new Vector3f(.5f), 100.f, 100.f, 10.f, .5f);
+		this.addCube(new Vector2f(200.f, -100.f), new Vector3f(.25f), 100.f, 200.f, 10.f, .25f);
 		
-		this.addCube(new Vector2f(0.f, -300.f), new Vector3f(1.f), this.worldSize.x * .45f * 2.f, 300.f, 10.f, 2.f);
-
-		VerletObject wo1 = new VerletObject(new Vector2f(-this.worldSize.x * .45f - 20.f, -500.f), 10.f);
-		wo1.fixed = true;
-		this.solver.addObject(wo1);
-		VerletObject wo2 = new VerletObject(new Vector2f(-this.worldSize.x * .45f - 20.f, 300.f), 10.f);
-		wo2.fixed = true;
-		this.solver.addObject(wo2);
-
-		LineObject wl1 = new LineObject(wo1, wo2);
-		this.solver.addLineObj(wl1);
-
-		VerletObject wo3 = new VerletObject(new Vector2f(this.worldSize.x * .45f + 20.f, -500.f), 10.f);
-		wo3.fixed = true;
-		this.solver.addObject(wo3);
-		VerletObject wo4 = new VerletObject(new Vector2f(this.worldSize.x * .45f + 20.f, 300.f), 10.f);
-		wo4.fixed = true;
-		this.solver.addObject(wo4);
-
-		LineObject wl2 = new LineObject(wo3, wo4);
-		this.solver.addLineObj(wl2);
-
-		LineObject wl3 = new LineObject(wo1, wo3);
-		this.solver.addLineObj(wl3);
+//		this.addCube(new Vector2f(0.f, -300.f), new Vector3f(1.f), this.worldSize.x * .45f * 2.f, 300.f, 10.f, 2.f);
+//
+//		VerletObject wo1 = new VerletObject(new Vector2f(-this.worldSize.x * .45f - 20.f, -500.f), 10.f);
+//		wo1.fixed = true;
+//		this.solver.addObject(wo1);
+//		VerletObject wo2 = new VerletObject(new Vector2f(-this.worldSize.x * .45f - 20.f, 300.f), 10.f);
+//		wo2.fixed = true;
+//		this.solver.addObject(wo2);
+//
+//		LineObject wl1 = new LineObject(wo1, wo2);
+//		this.solver.addLineObj(wl1);
+//
+//		VerletObject wo3 = new VerletObject(new Vector2f(this.worldSize.x * .45f + 20.f, -500.f), 10.f);
+//		wo3.fixed = true;
+//		this.solver.addObject(wo3);
+//		VerletObject wo4 = new VerletObject(new Vector2f(this.worldSize.x * .45f + 20.f, 300.f), 10.f);
+//		wo4.fixed = true;
+//		this.solver.addObject(wo4);
+//
+//		LineObject wl2 = new LineObject(wo3, wo4);
+//		this.solver.addLineObj(wl2);
+//
+//		LineObject wl3 = new LineObject(wo1, wo3);
+//		this.solver.addLineObj(wl3);
 	}
 	
 	private void addCube(Vector2f pos, Vector3f color, float width, float height, float objRadius, float springForce)
