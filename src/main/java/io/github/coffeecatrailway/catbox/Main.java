@@ -5,6 +5,7 @@ import io.github.coffeecatrailway.engine.physics.Solver;
 import io.github.coffeecatrailway.engine.physics.object.LineObject;
 import io.github.coffeecatrailway.engine.physics.object.VerletObject;
 import io.github.coffeecatrailway.engine.physics.object.constraint.DistanceConstraint;
+import io.github.coffeecatrailway.engine.physics.object.constraint.SpringConstraint;
 import io.github.coffeecatrailway.engine.renderer.LineRenderer;
 import io.github.coffeecatrailway.engine.renderer.ShapeRenderer;
 import io.github.coffeecatrailway.engine.renderer.window.ImGUIWrapper;
@@ -104,25 +105,68 @@ public class Main
 //		DistanceConstraint distConstraint = new DistanceConstraint(lo1, lo2);
 //		this.solver.addConstraint(distConstraint);
 		
-		VerletObject chainObjLast = new VerletObject(new Vector2f(-165.f, 0.f), 10.f);
-		chainObjLast.elasticity = .75f;
-		chainObjLast.fixed = true;
-		this.solver.addObject(chainObjLast);
-		for (int i = 0; i < 10; i++)
-		{
-			VerletObject chainObj = new VerletObject(new Vector2f(-165.f + 30.f * (i + 1.f), 0.f), 10.f);
-			chainObj.elasticity = .75f;
-			this.solver.addObject(chainObj);
-			
-			LineObject lineObj = new LineObject(chainObjLast, chainObj);
-			this.solver.addLineObj(lineObj);
-			
-			DistanceConstraint constraint = new DistanceConstraint(chainObjLast, chainObj, 40.f);
-			this.solver.addConstraint(constraint);
-			
-			chainObjLast = chainObj;
-		}
-		chainObjLast.fixed = true;
+//		VerletObject chainObjLast = new VerletObject(new Vector2f(-165.f, 0.f), 10.f);
+//		chainObjLast.elasticity = .75f;
+//		chainObjLast.fixed = true;
+//		this.solver.addObject(chainObjLast);
+//		for (int i = 0; i < 10; i++)
+//		{
+//			VerletObject chainObj = new VerletObject(new Vector2f(-165.f + 30.f * (i + 1.f), 0.f), 10.f);
+//			chainObj.elasticity = .75f;
+//			this.solver.addObject(chainObj);
+//
+//			LineObject lineObj = new LineObject(chainObjLast, chainObj);
+//			this.solver.addLineObj(lineObj);
+//
+//			DistanceConstraint constraint = new DistanceConstraint(chainObjLast, chainObj, 40.f);
+//			this.solver.addConstraint(constraint);
+//
+//			chainObjLast = chainObj;
+//		}
+//		chainObjLast.fixed = true;
+		
+		this.addCube(new Vector2f(-200.f, 0.f), new Vector3f(1.f), 10.f, 1.f);
+		this.addCube(new Vector2f(0.f, 0.f), new Vector3f(.5f), 10.f, .5f);
+		this.addCube(new Vector2f(200.f, 0.f), new Vector3f(.25f), 10.f, .25f);
+	}
+	
+	private void addCube(Vector2f pos, Vector3f color, float objRadius, float springForce)
+	{
+		VerletObject so1 = new VerletObject(new Vector2f(-50.f, -50.f).add(pos), objRadius);
+		so1.color = color;
+		this.solver.addObject(so1);
+		VerletObject so2 = new VerletObject(new Vector2f(50.f, -50.f).add(pos), objRadius);
+		so2.color = color;
+		this.solver.addObject(so2);
+		VerletObject so3 = new VerletObject(new Vector2f(50.f, 50.f).add(pos), objRadius);
+		so3.color = color;
+		this.solver.addObject(so3);
+		VerletObject so4 = new VerletObject(new Vector2f(-50.f, 50.f).add(pos), objRadius);
+		so4.color = color;
+		this.solver.addObject(so4);
+		
+		LineObject slObj1 = new LineObject(so1, so2);
+		this.solver.addLineObj(slObj1);
+		LineObject slObj2 = new LineObject(so2, so3);
+		this.solver.addLineObj(slObj2);
+		LineObject slObj3 = new LineObject(so3, so4);
+		this.solver.addLineObj(slObj3);
+		LineObject slObj4 = new LineObject(so4, so1);
+		this.solver.addLineObj(slObj4);
+		
+		SpringConstraint springConstraint1 = new SpringConstraint(so1, so2, springForce);
+		this.solver.addConstraint(springConstraint1);
+		SpringConstraint springConstraint2 = new SpringConstraint(so2, so3, springForce);
+		this.solver.addConstraint(springConstraint2);
+		SpringConstraint springConstraint3 = new SpringConstraint(so3, so4, springForce);
+		this.solver.addConstraint(springConstraint3);
+		SpringConstraint springConstraint4 = new SpringConstraint(so4, so1, springForce);
+		this.solver.addConstraint(springConstraint4);
+		
+		SpringConstraint springConstraint5 = new SpringConstraint(so1, so3, springForce);
+		this.solver.addConstraint(springConstraint5);
+		SpringConstraint springConstraint6 = new SpringConstraint(so2, so4, springForce);
+		this.solver.addConstraint(springConstraint6);
 	}
 	
 	private void updateTransform(float aspect)
@@ -161,7 +205,6 @@ public class Main
 			obj.setVelocity(velocity, this.solver.getStepDt());
 
 			this.solver.addObject(obj);
-//			this.solver.setObjectVelocity(obj, velocity);
 		}
 		
 		this.solver.update(dt);

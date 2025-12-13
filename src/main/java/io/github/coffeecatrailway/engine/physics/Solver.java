@@ -220,7 +220,7 @@ public class Solver
 	
 	public void render(ShapeRenderer shapeRenderer, LineRenderer lineRenderer)
 	{
-		shapeRenderer.pushCircle(this.constraintCenter, new Vector3f(0.1f), this.constraintRadius, 0.f);
+		shapeRenderer.pushCircle(this.constraintCenter, new Vector3f(0.15f), this.constraintRadius, 0.f);
 		
 		for (Constraint constraint : this.constraints)
 			constraint.render(shapeRenderer, lineRenderer);
@@ -240,7 +240,8 @@ public class Solver
 	public void gui(float windowWidth)
 	{
 		ImGui.text(String.format("Objects: %d", this.objects.size()));
-		ImGui.text(String.format("Lines: %d", this.lineObjects.size()));
+		ImGui.text(String.format("Line Objects: %d", this.lineObjects.size()));
+		ImGui.text(String.format("Constraints: %d", this.constraints.size()));
 		ImGui.text(String.format("Time elapsed: %f", this.time));
 		ImGui.text(String.format("Sub steps: %d", this.subSteps));
 		ImGui.text(String.format("Frame dt: %f", this.frameDt));
