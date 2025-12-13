@@ -10,7 +10,7 @@ public class VerletObject
 	public Vector2f position, positionLast, acceleration;
 	public Vector3f color;
 	public float radius, friction, elasticity;
-	public boolean fixed = false;
+	public boolean fixed = false, show = true;
 	
 	public VerletObject(Vector2f position, float radius)
 	{
@@ -66,7 +66,8 @@ public class VerletObject
 	
 	public void render(float dt, ShapeRenderer shapeRenderer, LineRenderer lineRenderer)
 	{
-		shapeRenderer.pushCircle(this.position, this.color, this.radius, .1f);
+		if (this.show)
+			shapeRenderer.pushCircle(this.position, this.color, this.radius, .1f);
 		
 //		Vector2f velocity = this.getVelocity(dt);
 //		if (velocity.length() > 10.f)

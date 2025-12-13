@@ -10,6 +10,7 @@ public class LineObject
 {
 	public VerletObject obj1, obj2;
 	public float thickness;
+	public boolean show = true;
 	
 	public LineObject(VerletObject obj1, VerletObject obj2)
 	{
@@ -43,15 +44,18 @@ public class LineObject
 	
 	public void render(ShapeRenderer shapeRenderer, LineRenderer lineRenderer)
 	{
-		float thickness = Math.max(this.thickness, .5f);
-		shapeRenderer.pushLine(this.obj1.position, this.obj2.position, this.obj1.color, thickness, 0.f);
-//		shapeRenderer.pushCircle(this.obj1.position, this.obj1.color, thickness * .5f, 0.f);
-//		shapeRenderer.pushCircle(this.obj2.position, this.obj2.color, thickness * .5f, 0.f);
-		
-		Vector2f half = this.obj1.position.add(this.obj2.position, new Vector2f()).mul(.5f);
-		final Vector3f red = new Vector3f(1.f, 0.f, 0.f);
-		final Vector3f blue = new Vector3f(0.f, 0.f, 1.f);
-		lineRenderer.pushLine(half, red, this.getNormal().mul(thickness).add(half), red);
-		lineRenderer.pushLine(half, blue, this.getTangent().mul(thickness).add(half), blue);
+		if (this.show)
+		{
+			float thickness = Math.max(this.thickness, .5f);
+			shapeRenderer.pushLine(this.obj1.position, this.obj2.position, this.obj1.color, thickness, 0.f);
+//		    shapeRenderer.pushCircle(this.obj1.position, this.obj1.color, thickness * .5f, 0.f);
+//		    shapeRenderer.pushCircle(this.obj2.position, this.obj2.color, thickness * .5f, 0.f);
+			
+			Vector2f half = this.obj1.position.add(this.obj2.position, new Vector2f()).mul(.5f);
+			final Vector3f red = new Vector3f(1.f, 0.f, 0.f);
+			final Vector3f blue = new Vector3f(0.f, 0.f, 1.f);
+			lineRenderer.pushLine(half, red, this.getNormal().mul(thickness).add(half), red);
+			lineRenderer.pushLine(half, blue, this.getTangent().mul(thickness).add(half), blue);
+		}
 	}
 }

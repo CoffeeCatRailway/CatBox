@@ -9,6 +9,7 @@ public class DistanceConstraint implements Constraint
 {
 	public VerletObject obj1, obj2;
 	public float distance;
+	public boolean show = false;
 	
 	public DistanceConstraint(VerletObject obj1, VerletObject obj2)
 	{
@@ -37,5 +38,8 @@ public class DistanceConstraint implements Constraint
 	
 	@Override
 	public void render(ShapeRenderer shapeRenderer, LineRenderer lineRenderer)
-	{}
+	{
+		if (this.show)
+			shapeRenderer.pushLine(this.obj1.position, this.obj2.position, this.obj1.color, this.obj1.radius, 0.f);
+	}
 }
