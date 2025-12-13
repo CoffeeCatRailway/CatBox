@@ -44,9 +44,9 @@ public class LineObject
 	public void render(ShapeRenderer shapeRenderer, LineRenderer lineRenderer)
 	{
 		float thickness = Math.max(this.thickness, .5f);
-		shapeRenderer.pushLine(this.obj1.position, this.obj2.position, new Vector3f(1.f), thickness, 0.f);
-		shapeRenderer.pushCircle(this.obj1.position, new Vector3f(1.f), thickness * .5f, 0.f);
-		shapeRenderer.pushCircle(this.obj2.position, new Vector3f(1.f), thickness * .5f, 0.f);
+		shapeRenderer.pushLine(this.obj1.position, this.obj2.position, this.obj1.color, thickness, 0.f);
+//		shapeRenderer.pushCircle(this.obj1.position, this.obj1.color, thickness * .5f, 0.f);
+//		shapeRenderer.pushCircle(this.obj2.position, this.obj2.color, thickness * .5f, 0.f);
 		
 		Vector2f half = this.obj1.position.add(this.obj2.position, new Vector2f()).mul(.5f);
 		final Vector3f red = new Vector3f(1.f, 0.f, 0.f);
