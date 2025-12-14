@@ -37,6 +37,7 @@ public class ShapeRenderer
 	private int vao, vbo;
 	private int floatsPushed = 0, lastFloatsPushed = 0;
 	private final int capacityIncrement;
+	public boolean enabled = true;
 	
 	public ShapeRenderer(int initialCapacity)
 	{
@@ -123,6 +124,8 @@ public class ShapeRenderer
 	
 	public void pushCircle(Vector2f pos, Vector3f color, float radius, float outline)
 	{
+		if (!this.enabled)
+			return;
 		this.checkSpace();
 		
 		this.buffer.put(ID_CIRCLE);
@@ -146,6 +149,8 @@ public class ShapeRenderer
 	
 	public void pushBox(Vector2f pos, Vector3f color, Vector2f size, float rotation, float outline)
 	{
+		if (!this.enabled)
+			return;
 		this.checkSpace();
 		
 		this.buffer.put(ID_BOX);
@@ -169,6 +174,8 @@ public class ShapeRenderer
 	
 	public void pushLine(Vector2f pos, Vector3f color, float length, float thickness, float rotation, float outline)
 	{
+		if (!this.enabled)
+			return;
 		this.checkSpace();
 		
 		this.buffer.put(ID_LINE);
@@ -192,6 +199,8 @@ public class ShapeRenderer
 	
 	public void pushLine(Vector2f p1, Vector2f p2, Vector3f color, float thickness, float outline)
 	{
+		if (!this.enabled)
+			return;
 		this.checkSpace();
 		
 		Vector2f delta = new Vector2f(p2).sub(p1);
@@ -217,7 +226,7 @@ public class ShapeRenderer
 	
 	public void drawFlush(Matrix4f transformMatrix)
 	{
-		if (this.buffer.position() < FLOATS - 1)
+		if (!this.enabled || this.buffer.position() < FLOATS - 1)
 			return;
 		
 		this.shader.bind();

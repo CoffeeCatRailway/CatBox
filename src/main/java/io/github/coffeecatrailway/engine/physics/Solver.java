@@ -266,9 +266,12 @@ public class Solver
 		ImGui.text(String.format("Objects: %d", this.objects.size()));
 		ImGui.text(String.format("Line Objects: %d", this.lineObjects.size()));
 		ImGui.text(String.format("Constraints: %d", this.constraints.size()));
+		ImGui.separator();
+		
 		ImGui.text(String.format("Time elapsed: %f", this.time));
 		ImGui.text(String.format("Sub steps: %d", this.subSteps));
 		ImGui.text(String.format("Frame dt: %f", this.frameDt));
+		ImGui.separator();
 		
 		ImGui.pushItemWidth(windowWidth * .5f);
 		float[] gravity = new float[] {this.gravity.x, this.gravity.y};

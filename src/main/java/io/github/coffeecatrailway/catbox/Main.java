@@ -275,11 +275,15 @@ public class Main
 			ImGui.colorEdit3("Clear Color", this.backgroundColor);
 			if (ImGui.collapsingHeader("Shape Renderer"))
 			{
+				if (ImGui.checkbox("Enabled##shape", this.shapeRenderer.enabled))
+					this.shapeRenderer.enabled = !this.shapeRenderer.enabled;
 				ImGui.text(String.format("Buffer capacity: %d", this.shapeRenderer.getBufferCapacity()));
 				ImGui.text(String.format("Last floats pushed: %d", this.shapeRenderer.getLastFloatsPushed()));
 			}
 			if (ImGui.collapsingHeader("Line Renderer"))
 			{
+				if (ImGui.checkbox("Enabled##line", this.lineRenderer.enabled))
+					this.lineRenderer.enabled = !this.lineRenderer.enabled;
 				ImGui.text(String.format("Buffer capacity: %d", this.lineRenderer.getBufferCapacity()));
 				ImGui.text(String.format("Last floats pushed: %d", this.lineRenderer.getLastFloatsPushed()));
 			}

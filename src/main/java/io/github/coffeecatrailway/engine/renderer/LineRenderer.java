@@ -34,6 +34,7 @@ public class LineRenderer
 	private int vao, vbo;
 	private int floatsPushed = 0, lastFloatsPushed = 0;
 	private final int capacityIncrement;
+	public boolean enabled = true;
 	
 	public LineRenderer(int initialCapacity)
 	{
@@ -96,6 +97,8 @@ public class LineRenderer
 	
 	public void pushLine(Vector2f pos1, Vector3f color1, Vector2f pos2, Vector3f color2)
 	{
+		if (!this.enabled)
+			return;
 		this.checkSpace();
 		
 		this.buffer.put(pos1.x);
@@ -117,7 +120,7 @@ public class LineRenderer
 	
 	public void drawFlush(Matrix4f transformMatrix)
 	{
-		if (this.buffer.position() < (FLOATS * 2) - 1)
+		if (!this.enabled || this.buffer.position() < (FLOATS * 2) - 1)
 			return;
 		
 		this.shader.bind();
