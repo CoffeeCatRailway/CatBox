@@ -19,7 +19,7 @@ public class Solver
 	public final Vector2f gravity = new Vector2f(0.f);
 	
 	private final Vector2f worldCenter = new Vector2f(0.f);
-	private final Vector2f worldSize = new Vector2f(100.f);
+	private final Vector2f worldSize;
 	
 	private final ArrayList<VerletObject> objects = new ArrayList<>();
 	private final ArrayList<LineObject> lineObjects = new ArrayList<>();
@@ -29,7 +29,7 @@ public class Solver
 	
 	public Solver(float worldWidth, float worldHeight)
 	{
-		this.worldSize.set(worldWidth, worldHeight);
+		this.worldSize = new Vector2f(worldWidth, worldHeight);
 	}
 	
 	private void solveObjectObjectContact(VerletObject obj1, VerletObject obj2)
