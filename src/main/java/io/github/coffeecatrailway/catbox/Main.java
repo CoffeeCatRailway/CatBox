@@ -4,7 +4,6 @@ import imgui.ImGui;
 import io.github.coffeecatrailway.engine.physics.Solver;
 import io.github.coffeecatrailway.engine.physics.object.LineObject;
 import io.github.coffeecatrailway.engine.physics.object.VerletObject;
-import io.github.coffeecatrailway.engine.physics.object.constraint.DistanceConstraint;
 import io.github.coffeecatrailway.engine.physics.object.constraint.SpringConstraint;
 import io.github.coffeecatrailway.engine.renderer.LineRenderer;
 import io.github.coffeecatrailway.engine.renderer.ShapeRenderer;
@@ -36,7 +35,7 @@ public class Main
 	
 	// Options
 	private boolean vSync = false, pauseFixed = true, btnStepFixed = false;
-	private final Vector2f worldSize = new Vector2f(1200.f);
+	private final Vector2f worldSize = new Vector2f(1000.f, 800.f);
 	
 	private final float[] backgroundColor = {
 			// 0.f, 0.f, 0.f
@@ -62,9 +61,9 @@ public class Main
 		final int platform = System.getProperty("os.name").toLowerCase(Locale.ROOT).contains("linux") ? GLFW_PLATFORM_X11 : GLFW_ANY_PLATFORM;
 		this.window.init("CatBox", this.vSync, platform);
 
-		GLFWFramebufferSizeCallbackI callback = (window, width, height) -> this.updateTransform((float) width / (float) height);
+		GLFWFramebufferSizeCallbackI callback = (window, width, height) -> this.updateTransform((float) width, (float) height);
 		this.window.setFramebufferCallback(callback);
-		this.updateTransform((float) this.window.getWidth() / (float) this.window.getHeight());
+		this.updateTransform((float) this.window.getWidth(), (float) this.window.getHeight());
 		
 		this.imgui.init(this.window.getHandle());
 		
@@ -194,20 +193,22 @@ public class Main
 		this.solver.addConstraint(springConstraint6);
 	}
 	
-	private void updateTransform(float aspect)
+	private void updateTransform(float windowWidth, float windowHeight)
 	{
-		boolean aspectOne = aspect >= 1.f;
-		float left = -this.worldSize.x * .5f * (aspectOne ? aspect : 1.f);
-		float right = this.worldSize.x * .5f * (aspectOne ? aspect : 1.f);
-		float bottom = -this.worldSize.y * .5f / (aspectOne ? 1.f : aspect);
-		float top = this.worldSize.y * .5f / (aspectOne ? 1.f : aspect);
-		this.transformMatrix.setOrtho(left, right, bottom, top, -1.f, 1.f);
+		final float windowAspect = windowWidth / windowHeight;
+		final float simAspect = this.worldSize.x / this.worldSize.y;
+		
+		final float width = this.worldSize.x * .5f;
+		final float height = this.worldSize.y * .5f;
+		
+		if (windowAspect >= simAspect)
+			this.transformMatrix.setOrtho(-(windowAspect / simAspect) * width, (windowAspect / simAspect) * width, -height, height, -1.f, 1.f);
+		else
+			this.transformMatrix.setOrtho(-width, width, -(simAspect / windowAspect) * height, (simAspect / windowAspect) * height, -1.f, 1.f);
 	}
 	
 	private void update(float dt)
-	{
-	
-	}
+	{}
 	
 	private Vector3f getRainbow(float t)
 	{
