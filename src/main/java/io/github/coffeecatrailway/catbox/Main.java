@@ -219,11 +219,11 @@ public class Main
 	
 	private void fixedUpdate(float dt)
 	{
-		if (this.solver.getObjectCount() < 1500 && (this.fixedFrameCount % 5) == 0)
+		if (this.solver.getObjectCount() < 4000 && (this.fixedFrameCount % 2) == 0)
 		{
 			final float radius = RandUtil.getRange(2.f, 15.f);
 			
-			Vector2f velocity = new Vector2f(400.f, 0.f);
+			Vector2f velocity = new Vector2f(1000.f, 0.f);
 			VerletObject obj = new VerletObject(new Vector2f(-this.worldSize.y * .5f * .95f, this.worldSize.y * .5f * .75f), radius);
 //			Vector2f velocity = new Vector2f(500.f * Math.sin(this.solver.getTime()), -400.f);
 //			VerletObject obj = new VerletObject(new Vector2f(0.f, this.worldSize.y * .5f * .75f), radius);

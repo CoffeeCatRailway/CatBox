@@ -11,6 +11,7 @@ import org.joml.Vector2f;
 import org.joml.Vector3f;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 
 public class Solver
 {
@@ -60,7 +61,11 @@ public class Solver
 			VerletObject obj1 = this.objects.get(i);
 			// obj-obj
 			for (int j = i + 1; j < this.objects.size(); j++)
-				this.solveObjectObjectContact(obj1, this.objects.get(j));
+			{
+				VerletObject obj2 = this.objects.get(j);
+				if ((obj2.position.x - obj2.radius) > (obj1.position.x + obj1.radius)) break;
+				this.solveObjectObjectContact(obj1, obj2);
+			}
 
 			// obj-line
 			for (LineObject lineObj : this.lineObjects)
@@ -153,6 +158,11 @@ public class Solver
 			this.applyWorldConstraint(obj);
 		}
 	}
+
+	private void sortObjectsByLeft()
+	{
+		this.objects.sort(Comparator.comparingInt(o -> (int) (o.position.x - o.radius)));
+	}
 	
 	public void update(float dt)
 	{
@@ -160,6 +170,7 @@ public class Solver
 		final float stepDt = this.getStepDt();
 		for (int i = 0; i < this.subSteps; i++)
 		{
+			this.sortObjectsByLeft();
 			this.checkCollisions(stepDt);
 			
 			for (Constraint constraint : this.constraints)
