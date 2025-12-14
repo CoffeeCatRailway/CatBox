@@ -272,6 +272,19 @@ public class Main
 			}
 			ImGui.separator();
 			
+			ImGui.colorEdit3("Clear Color", this.backgroundColor);
+			if (ImGui.collapsingHeader("Shape Renderer"))
+			{
+				ImGui.text(String.format("Buffer capacity: %d", this.shapeRenderer.getBufferCapacity()));
+				ImGui.text(String.format("Last floats pushed: %d", this.shapeRenderer.getLastFloatsPushed()));
+			}
+			if (ImGui.collapsingHeader("Line Renderer"))
+			{
+				ImGui.text(String.format("Buffer capacity: %d", this.lineRenderer.getBufferCapacity()));
+				ImGui.text(String.format("Last floats pushed: %d", this.lineRenderer.getLastFloatsPushed()));
+			}
+			ImGui.separator();
+			
 			ImGui.text(String.format("Delta time: %fs", this.sysTimer.getElapsedSeconds()));
 			ImGui.text(String.format("Fixed delta time: %fs", this.updateTimer.getElapsedSeconds()));
 			
@@ -286,8 +299,6 @@ public class Main
 			ImGui.text(String.format("Cycle time (1/tps): %fs", this.cycleTime));
 			ImGui.popItemWidth();
 			ImGui.separator();
-			
-			ImGui.colorEdit3("Clear Color", this.backgroundColor);
 		}
 		ImGui.end();
 		
@@ -308,7 +319,6 @@ public class Main
 		System.out.println("Starting main loop");
 		while (!glfwWindowShouldClose(this.window.getHandle()))
 		{
-			
 			// Get amount of time passed for one cycle
 			this.sysTimer.tick();
 			accumulatedSeconds += this.sysTimer.getElapsedSeconds();

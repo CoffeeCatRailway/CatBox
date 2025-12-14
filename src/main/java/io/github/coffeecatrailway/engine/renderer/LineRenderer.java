@@ -46,6 +46,16 @@ public class LineRenderer
 		this.capacityIncrement = capacityIncrement;
 	}
 	
+	public int getBufferCapacity()
+	{
+		return this.buffer.capacity();
+	}
+	
+	public int getLastFloatsPushed()
+	{
+		return this.lastFloatsPushed;
+	}
+	
 	public void init()
 	{
 		System.out.println("Initializing line renderer");
