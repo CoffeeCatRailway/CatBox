@@ -32,10 +32,18 @@ public class LineRenderer
 	private FloatBuffer buffer;
 	private Shader shader;
 	private int vao, vbo;
+	private int floatsPushed = 0, lastFloatsPushed = 0;
+	private final int capacityIncrement;
 	
-	public LineRenderer(int defaultShapeCount)
+	public LineRenderer(int initialCapacity)
 	{
-		this.buffer = MemoryUtil.memCallocFloat(defaultShapeCount * FLOATS * 2);
+		this(initialCapacity, initialCapacity);
+	}
+	
+	public LineRenderer(int initialCapacity, int capacityIncrement)
+	{
+		this.buffer = MemoryUtil.memCallocFloat(initialCapacity * FLOATS * 2);
+		this.capacityIncrement = capacityIncrement;
 	}
 	
 	public void init()
@@ -73,7 +81,7 @@ public class LineRenderer
 	private void checkSpace()
 	{
 		if (this.buffer.position() >= this.buffer.capacity() - 1)
-			this.buffer = MemoryUtil.memRealloc(this.buffer, this.buffer.capacity() + FLOATS * 2);
+			this.buffer = MemoryUtil.memRealloc(this.buffer, this.buffer.capacity() + this.capacityIncrement * FLOATS * 2);
 	}
 	
 	public void pushLine(Vector2f pos1, Vector3f color1, Vector2f pos2, Vector3f color2)
@@ -93,6 +101,8 @@ public class LineRenderer
 		this.buffer.put(color2.x);
 		this.buffer.put(color2.y);
 		this.buffer.put(color2.z);
+		
+		this.floatsPushed += FLOATS * 2;
 	}
 	
 	public void drawFlush(Matrix4f transformMatrix)
@@ -106,13 +116,17 @@ public class LineRenderer
 		int drawCount = this.buffer.position() / FLOATS;
 		
 		this.buffer.clear();
-		glNamedBufferData(this.vbo, this.buffer, GL_DYNAMIC_DRAW);
-//		glNamedBufferSubData(this.vbo, 0L, this.buffer);
+		if (this.floatsPushed > this.lastFloatsPushed)
+			glNamedBufferData(this.vbo, this.buffer, GL_DYNAMIC_DRAW);
+		else
+			glNamedBufferSubData(this.vbo, 0L, this.buffer);
 		
 		glBindVertexArray(this.vao);
 		glDrawArrays(GL_LINES, 0, drawCount);
 		
 		this.buffer.rewind();
+		this.lastFloatsPushed = this.floatsPushed;
+		this.floatsPushed = 0;
 	}
 	
 	public void destroy()

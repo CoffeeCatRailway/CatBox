@@ -67,10 +67,10 @@ public class Main
 		
 		this.imgui.init(this.window.getHandle());
 		
-		this.shapeRenderer = new ShapeRenderer(10);
+		this.shapeRenderer = new ShapeRenderer(100);
 		this.shapeRenderer.init();
 		
-		this.lineRenderer = new LineRenderer(10);
+		this.lineRenderer = new LineRenderer(100);
 		this.lineRenderer.init();
 		
 		this.solver = new Solver(this.worldSize.x, this.worldSize.y);

@@ -35,10 +35,18 @@ public class ShapeRenderer
 	private FloatBuffer buffer;
 	private Shader shader;
 	private int vao, vbo;
+	private int floatsPushed = 0, lastFloatsPushed = 0;
+	private final int capacityIncrement;
 	
-	public ShapeRenderer(int defaultShapeCount)
+	public ShapeRenderer(int initialCapacity)
 	{
-		this.buffer = MemoryUtil.memCallocFloat(defaultShapeCount * FLOATS);
+		this(initialCapacity, initialCapacity);
+	}
+	
+	public ShapeRenderer(int initialCapacity, int capacityIncrement)
+	{
+		this.buffer = MemoryUtil.memCallocFloat(initialCapacity * FLOATS);
+		this.capacityIncrement = capacityIncrement;
 	}
 	
 	public void init()
@@ -100,7 +108,7 @@ public class ShapeRenderer
 	private void checkSpace()
 	{
 		if (this.buffer.position() >= this.buffer.capacity() - 1)
-			this.buffer = MemoryUtil.memRealloc(this.buffer, this.buffer.capacity() + FLOATS);
+			this.buffer = MemoryUtil.memRealloc(this.buffer, this.buffer.capacity() + this.capacityIncrement * FLOATS);
 	}
 	
 	public void pushCircle(Vector2f pos, Vector3f color, float radius, float outline)
@@ -122,6 +130,8 @@ public class ShapeRenderer
 		this.buffer.put(0.f); // rotation
 		
 		this.buffer.put(outline);
+		
+		this.floatsPushed += FLOATS;
 	}
 	
 	public void pushBox(Vector2f pos, Vector3f color, Vector2f size, float rotation, float outline)
@@ -143,6 +153,8 @@ public class ShapeRenderer
 		this.buffer.put(rotation);
 		
 		this.buffer.put(outline);
+		
+		this.floatsPushed += FLOATS;
 	}
 	
 	public void pushLine(Vector2f pos, Vector3f color, float length, float thickness, float rotation, float outline)
@@ -164,6 +176,8 @@ public class ShapeRenderer
 		this.buffer.put(rotation);
 		
 		this.buffer.put(outline);
+		
+		this.floatsPushed += FLOATS;
 	}
 	
 	public void pushLine(Vector2f p1, Vector2f p2, Vector3f color, float thickness, float outline)
@@ -187,6 +201,8 @@ public class ShapeRenderer
 		this.buffer.put(Math.atan2(delta.y, delta.x));
 		
 		this.buffer.put(outline);
+		
+		this.floatsPushed += FLOATS;
 	}
 	
 	public void drawFlush(Matrix4f transformMatrix)
@@ -200,13 +216,22 @@ public class ShapeRenderer
 		int drawCount = this.buffer.position() / FLOATS;
 		
 		this.buffer.clear();
-		glNamedBufferData(this.vbo, this.buffer, GL_DYNAMIC_DRAW);
-//		glNamedBufferSubData(this.vbo, 0L, this.buffer);
+		if (this.floatsPushed > this.lastFloatsPushed)
+		{
+//			System.out.println("buffer data");
+			glNamedBufferData(this.vbo, this.buffer, GL_DYNAMIC_DRAW);
+		} else
+		{
+//			System.out.println("buffer sub data");
+			glNamedBufferSubData(this.vbo, 0L, this.buffer);
+		}
 		
 		glBindVertexArray(this.vao);
 		glDrawArrays(GL_POINTS, 0, drawCount);
 		
 		this.buffer.rewind();
+		this.lastFloatsPushed = this.floatsPushed;
+		this.floatsPushed = 0;
 	}
 	
 	public void destroy()
