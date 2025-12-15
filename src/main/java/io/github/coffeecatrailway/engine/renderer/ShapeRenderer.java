@@ -138,7 +138,7 @@ public class ShapeRenderer
 		this.buffer.put(color.z);
 		
 		this.buffer.put(radius);
-		this.buffer.put(0.f); // size.y
+		this.buffer.put(radius);
 		
 		this.buffer.put(0.f); // rotation
 		

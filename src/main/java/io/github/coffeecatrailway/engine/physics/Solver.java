@@ -244,7 +244,7 @@ public class Solver
 	public void render(ShapeRenderer shapeRenderer, LineRenderer lineRenderer)
 	{
 //		shapeRenderer.pushCircle(this.constraintCenter, new Vector3f(0.15f), this.constraintRadius, 0.f);
-		shapeRenderer.pushBox(this.worldCenter, new Vector3f(.15f), this.worldSize, 0.f, 0.f);
+		shapeRenderer.pushBox(this.worldCenter, new Vector3f(.15f), this.worldSize, 0.f, 10.f);
 		
 		for (Constraint constraint : this.constraints)
 			constraint.render(shapeRenderer, lineRenderer);

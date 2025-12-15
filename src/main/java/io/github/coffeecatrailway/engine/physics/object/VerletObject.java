@@ -68,7 +68,7 @@ public class VerletObject
 	{
 		if (this.show)
 		{
-			shapeRenderer.pushCircle(this.position, this.color, this.radius, .1f);
+			shapeRenderer.pushCircle(this.position, this.color, this.radius, 2.f);
 			
 			Vector2f velocity = this.getVelocity(dt);
 			Vector3f color = new Vector3f(1.f).sub(this.color);

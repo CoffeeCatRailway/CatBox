@@ -45,7 +45,7 @@ public class SpringConstraint implements Constraint
 	{
 		if (this.show)
 		{
-			shapeRenderer.pushLine(this.obj1.position, this.obj2.position, this.obj1.color, this.obj1.radius, 0.f);
+			shapeRenderer.pushLine(this.obj1.position, this.obj2.position, this.obj1.color, this.obj1.radius, 2.f);
 			
 			Vector3f c1 = new Vector3f(1.f).sub(this.obj1.color);
 			Vector3f c2 = new Vector3f(1.f).sub(this.obj2.color);

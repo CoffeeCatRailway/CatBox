@@ -161,6 +161,7 @@ public class Main
 		lo1.color = new Vector3f(1.f, 0.f, 0.f);
 		lo1.fixed = true;
 		VerletObject lo2 = new VerletObject(new Vector2f(-this.worldSize.x * .25f, -this.worldSize.y * .25f), 20.f);
+		lo2.show = false;
 		this.solver.addObject(lo1);
 		this.solver.addObject(lo2);
 		this.solver.addLineObj(new LineObject(lo1, lo2));

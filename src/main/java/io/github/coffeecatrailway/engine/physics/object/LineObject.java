@@ -47,7 +47,7 @@ public class LineObject
 		if (this.show)
 		{
 			float thickness = Math.max(this.thickness, .5f);
-			shapeRenderer.pushLine(this.obj1.position, this.obj2.position, this.obj1.color, thickness, 0.f);
+			shapeRenderer.pushLine(this.obj1.position, this.obj2.position, this.obj1.color, thickness, 2.f);
 //		    shapeRenderer.pushCircle(this.obj1.position, this.obj1.color, thickness * .5f, 0.f);
 //		    shapeRenderer.pushCircle(this.obj2.position, this.obj2.color, thickness * .5f, 0.f);
 			

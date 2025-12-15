@@ -42,25 +42,26 @@ void main()
 	f_size = g_size[0];
 	f_outline = g_outline[0];
 	
-	float r = g_size[0].x;
-	if (g_shapeId[0] == ID_BOX)
-		r = max(g_size[0].x, g_size[0].y) * .5f;
-	else if (g_shapeId[0] == ID_LINE)
-		r = g_size[0].x;
-	
 	vec4 bl, br, tl, tr;
-	if(g_shapeId[0] == ID_LINE)
+	if (g_shapeId[0] == ID_CIRCLE)
 	{
-		bl = vec4(0., -r * .5, 0., 0.);
-		br = vec4(r, -r * .5, 0., 0.);
-		tl = vec4(0., r * .5, 0., 0.);
-		tr = vec4(r, r * .5, 0., 0.);
-	} else
-	{
+		float r = g_size[0].x;
 		bl = vec4(-r, -r, 0., 0.);
 		br = vec4(r, -r, 0., 0.);
 		tl = vec4(-r, r, 0., 0.);
 		tr = vec4(r, r, 0., 0.);
+	} else if (g_shapeId[0] == ID_BOX)
+	{
+		bl = vec4(-g_size[0].x * .5f, -g_size[0].y * .5f, 0., 0.);
+		br = vec4(g_size[0].x * .5f, -g_size[0].y * .5f, 0., 0.);
+		tl = vec4(-g_size[0].x * .5f, g_size[0].y * .5f, 0., 0.);
+		tr = vec4(g_size[0].x * .5f, g_size[0].y * .5f, 0., 0.);
+	} else if (g_shapeId[0] == ID_LINE)
+	{
+		bl = vec4(0., -g_size[0].y * .5f, 0., 0.);
+		br = vec4(g_size[0].x, -g_size[0].y * .5f, 0., 0.);
+		tl = vec4(0., g_size[0].y * .5f, 0., 0.);
+		tr = vec4(g_size[0].x, g_size[0].y * .5f, 0., 0.);
 	}
 	
 	if (g_shapeId[0] != ID_CIRCLE)
