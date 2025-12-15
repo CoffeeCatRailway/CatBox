@@ -17,7 +17,7 @@ void main()
 {
 	vec2 uvSize = f_uv * f_size;
 	bool isCircle = f_shapeId == ID_CIRCLE;
-	if (isCircle && length(f_uv) > 1.)
+	if (isCircle && length(f_uv) >= 1.)
 		discard;
 	
 	FragColor = vec4(f_color, 1.);
