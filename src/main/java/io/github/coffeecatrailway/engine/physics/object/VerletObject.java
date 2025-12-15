@@ -67,14 +67,13 @@ public class VerletObject
 	public void render(float dt, ShapeRenderer shapeRenderer, LineRenderer lineRenderer)
 	{
 		if (this.show)
+		{
 			shapeRenderer.pushCircle(this.position, this.color, this.radius, .1f);
-		
-//		Vector2f velocity = this.getVelocity(dt);
-//		if (velocity.length() > 10.f)
-//		{
-//			Vector3f color = new Vector3f(1.f).sub(this.color);
-//			Vector2f p2 = new Vector2f(this.position).add(velocity.mul(.5f));
-//			lineRenderer.pushLine(this.position, color, p2, color);
-//		}
+			
+			Vector2f velocity = this.getVelocity(dt);
+			Vector3f color = new Vector3f(1.f).sub(this.color);
+			Vector2f p2 = new Vector2f(this.position).add(velocity.mul(1.f));
+			lineRenderer.pushLine(this.position, color, p2, color);
+		}
 	}
 }

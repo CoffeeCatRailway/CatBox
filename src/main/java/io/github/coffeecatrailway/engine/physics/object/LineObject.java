@@ -51,6 +51,9 @@ public class LineObject
 //		    shapeRenderer.pushCircle(this.obj1.position, this.obj1.color, thickness * .5f, 0.f);
 //		    shapeRenderer.pushCircle(this.obj2.position, this.obj2.color, thickness * .5f, 0.f);
 			
+			Vector3f c1 = new Vector3f(1.f).sub(this.obj1.color);
+			Vector3f c2 = new Vector3f(1.f).sub(this.obj2.color);
+			lineRenderer.pushLine(this.obj1.position, c1, this.obj2.position, c2);
 			Vector2f half = this.obj1.position.add(this.obj2.position, new Vector2f()).mul(.5f);
 			final Vector3f red = new Vector3f(1.f, 0.f, 0.f);
 			final Vector3f blue = new Vector3f(0.f, 0.f, 1.f);
