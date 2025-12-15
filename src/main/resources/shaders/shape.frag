@@ -21,7 +21,7 @@ void main()
 		discard;
 	
 	FragColor = vec4(f_color, 1.);
-	FragColor = vec4(f_uv * .5 + .5, 0., 1.);
+//	FragColor = vec4(f_uv * .5 + .5, 0., 1.);
 	
 	bool circleOutline = isCircle && length(uvSize) > f_size.x - f_outline;
 	bool boxLineOutline = abs(uvSize.x) > f_size.x - f_outline || abs(uvSize.y) > f_size.y - f_outline;
