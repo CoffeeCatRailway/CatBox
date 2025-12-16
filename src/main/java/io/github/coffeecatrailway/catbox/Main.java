@@ -132,7 +132,7 @@ public class Main
 //		this.addCube(new Vector2f(0.f, 55.f), new Vector3f(.5f), 100.f, 100.f, 5.f, .5f);
 //		this.addCube(new Vector2f(200.f, 55.f), new Vector3f(.25f), 50.f, 100.f, 5.f, .25f);
 		
-		this.addCube(new Vector2f(0.f), new Vector3f(1.f), this.worldSize.x - 10.f, 300.f, 10.f, 4.f);
+		this.addCube(new Vector2f(0.f), new Vector3f(1.f), this.worldSize.x - 20.f, 300.f, 10.f, 4.f);
 		
 //		this.addCube(new Vector2f(0.f, 0.f), new Vector3f(1.f), this.worldSize.x * .45f * 2.f, 200.f, 10.f, 4.f);
 //
