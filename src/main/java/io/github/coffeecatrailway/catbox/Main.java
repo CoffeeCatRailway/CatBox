@@ -40,9 +40,9 @@ public class Main
 	
 	private final float[] backgroundColor = {
 			// 0.f, 0.f, 0.f
-			95.f / 255.f,
 			68.f / 255.f,
-			151.f / 255.f
+			151.f / 255.f,
+			68.f / 255.f
 	};
 	
 	// Timing
@@ -256,11 +256,11 @@ public class Main
 	
 	private void fixedUpdate(float dt)
 	{
-		if (this.solver.getObjectCount() < 2000 && (this.fixedFrameCount % 4) == 0)
+		if (this.solver.getObjectCount() < 2000 && (this.fixedFrameCount % 2) == 0)
 		{
-			final float radius = RandUtil.getRange(5.f, 10.f);
+			final float radius = RandUtil.getRange(2.5f, 10.f);
 
-			Vector2f velocity = new Vector2f(500.f, 0.f);
+			Vector2f velocity = new Vector2f(700.f, 0.f);
 			VerletObject obj = new VerletObject(new Vector2f(-this.worldSize.y * .5f * .95f, this.worldSize.y * .5f * .75f), radius);
 //			Vector2f velocity = new Vector2f(500.f * Math.sin(this.solver.getTime()), -400.f);
 //			VerletObject obj = new VerletObject(new Vector2f(0.f, this.worldSize.y * .5f * .75f), radius);
