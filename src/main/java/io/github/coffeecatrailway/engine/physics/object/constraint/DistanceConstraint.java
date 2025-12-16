@@ -1,8 +1,8 @@
 package io.github.coffeecatrailway.engine.physics.object.constraint;
 
 import io.github.coffeecatrailway.engine.physics.object.VerletObject;
-import io.github.coffeecatrailway.engine.renderer.LineRenderer;
-import io.github.coffeecatrailway.engine.renderer.ShapeRenderer;
+import io.github.coffeecatrailway.engine.render.LineRenderer;
+import io.github.coffeecatrailway.engine.render.ShapeRenderer;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 

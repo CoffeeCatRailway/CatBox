@@ -1,4 +1,4 @@
-package io.github.coffeecatrailway.engine.renderer;
+package io.github.coffeecatrailway.engine.render;
 
 import org.joml.Math;
 import org.joml.Matrix4f;

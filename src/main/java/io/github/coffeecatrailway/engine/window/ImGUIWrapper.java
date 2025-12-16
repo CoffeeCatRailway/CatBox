@@ -1,4 +1,4 @@
-package io.github.coffeecatrailway.engine.renderer.window;
+package io.github.coffeecatrailway.engine.window;
 
 import imgui.ImGui;
 import imgui.ImGuiIO;

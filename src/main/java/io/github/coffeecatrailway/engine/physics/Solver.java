@@ -5,8 +5,8 @@ import io.github.coffeecatrailway.catbox.RandUtil;
 import io.github.coffeecatrailway.engine.physics.object.LineObject;
 import io.github.coffeecatrailway.engine.physics.object.VerletObject;
 import io.github.coffeecatrailway.engine.physics.object.constraint.Constraint;
-import io.github.coffeecatrailway.engine.renderer.LineRenderer;
-import io.github.coffeecatrailway.engine.renderer.ShapeRenderer;
+import io.github.coffeecatrailway.engine.render.LineRenderer;
+import io.github.coffeecatrailway.engine.render.ShapeRenderer;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 
