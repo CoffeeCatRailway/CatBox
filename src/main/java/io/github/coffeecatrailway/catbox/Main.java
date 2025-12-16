@@ -132,22 +132,24 @@ public class Main
 //		this.addCube(new Vector2f(0.f, 55.f), new Vector3f(.5f), 100.f, 100.f, 5.f, .5f);
 //		this.addCube(new Vector2f(200.f, 55.f), new Vector3f(.25f), 50.f, 100.f, 5.f, .25f);
 		
-//		this.addCube(new Vector2f(0.f, -300.f), new Vector3f(1.f), this.worldSize.x * .45f * 2.f, 300.f, 10.f, 2.f);
+		this.addCube(new Vector2f(0.f), new Vector3f(1.f), this.worldSize.x - 10.f, 300.f, 10.f, 4.f);
+		
+//		this.addCube(new Vector2f(0.f, 0.f), new Vector3f(1.f), this.worldSize.x * .45f * 2.f, 200.f, 10.f, 4.f);
 //
-//		VerletObject wo1 = new VerletObject(new Vector2f(-this.worldSize.x * .45f - 20.f, -500.f), 10.f);
+//		VerletObject wo1 = new VerletObject(new Vector2f(-this.worldSize.x * .45f - 20.f, -this.worldSize.y * .5f * .9f), 10.f);
 //		wo1.fixed = true;
 //		this.solver.addObject(wo1);
-//		VerletObject wo2 = new VerletObject(new Vector2f(-this.worldSize.x * .45f - 20.f, 300.f), 10.f);
+//		VerletObject wo2 = new VerletObject(new Vector2f(-this.worldSize.x * .45f - 20.f, this.worldSize.y * .5f * .8f), 10.f);
 //		wo2.fixed = true;
 //		this.solver.addObject(wo2);
 //
 //		LineObject wl1 = new LineObject(wo1, wo2);
 //		this.solver.addLineObj(wl1);
 //
-//		VerletObject wo3 = new VerletObject(new Vector2f(this.worldSize.x * .45f + 20.f, -500.f), 10.f);
+//		VerletObject wo3 = new VerletObject(new Vector2f(this.worldSize.x * .45f + 20.f, -this.worldSize.y * .5f * .9f), 10.f);
 //		wo3.fixed = true;
 //		this.solver.addObject(wo3);
-//		VerletObject wo4 = new VerletObject(new Vector2f(this.worldSize.x * .45f + 20.f, 300.f), 10.f);
+//		VerletObject wo4 = new VerletObject(new Vector2f(this.worldSize.x * .45f + 20.f, this.worldSize.y * .5f * .8f), 10.f);
 //		wo4.fixed = true;
 //		this.solver.addObject(wo4);
 //
@@ -157,35 +159,35 @@ public class Main
 //		LineObject wl3 = new LineObject(wo1, wo3);
 //		this.solver.addLineObj(wl3);
 		
-		VerletObject lo1 = new VerletObject(new Vector2f(-this.worldSize.x * .25f, this.worldSize.y * .25f), 20.f);
-		lo1.color = new Vector3f(1.f, 0.f, 0.f);
-		lo1.fixed = true;
-		VerletObject lo2 = new VerletObject(new Vector2f(-this.worldSize.x * .25f, -this.worldSize.y * .25f), 20.f);
-		lo2.show = false;
-		this.solver.addObject(lo1);
-		this.solver.addObject(lo2);
-		this.solver.addLineObj(new LineObject(lo1, lo2));
-		this.solver.addConstraint(new DistanceConstraint(lo1, lo2));
-		
-		VerletObject do1 = new VerletObject(new Vector2f(0.f, this.worldSize.y * .25f), 20.f);
-		do1.color = new Vector3f(0.f, 1.f, 0.f);
-		do1.fixed = true;
-		VerletObject do2 = new VerletObject(new Vector2f(0.f, -this.worldSize.y * .25f), 20.f);
-		this.solver.addObject(do1);
-		this.solver.addObject(do2);
-		DistanceConstraint dc = new DistanceConstraint(do1, do2);
-		dc.show = true;
-		this.solver.addConstraint(dc);
-		
-		VerletObject so1 = new VerletObject(new Vector2f(this.worldSize.x * .25f, this.worldSize.y * .25f), 20.f);
-		so1.color = new Vector3f(0.f, 0.f, 1.f);
-		so1.fixed = true;
-		VerletObject so2 = new VerletObject(new Vector2f(this.worldSize.x * .25f, -this.worldSize.y * .25f), 20.f);
-		this.solver.addObject(so1);
-		this.solver.addObject(so2);
-		SpringConstraint sc = new SpringConstraint(so1, so2, .1f);
-		sc.show = true;
-		this.solver.addConstraint(sc);
+//		VerletObject lo1 = new VerletObject(new Vector2f(-this.worldSize.x * .25f, this.worldSize.y * .25f), 20.f);
+//		lo1.color = new Vector3f(1.f, 0.f, 0.f);
+//		lo1.fixed = true;
+//		VerletObject lo2 = new VerletObject(new Vector2f(-this.worldSize.x * .25f, -this.worldSize.y * .25f), 20.f);
+////		lo2.show = false;
+//		this.solver.addObject(lo1);
+//		this.solver.addObject(lo2);
+//		this.solver.addLineObj(new LineObject(lo1, lo2));
+//		this.solver.addConstraint(new DistanceConstraint(lo1, lo2));
+//
+//		VerletObject do1 = new VerletObject(new Vector2f(0.f, this.worldSize.y * .25f), 20.f);
+//		do1.color = new Vector3f(0.f, 1.f, 0.f);
+//		do1.fixed = true;
+//		VerletObject do2 = new VerletObject(new Vector2f(0.f, -this.worldSize.y * .25f), 20.f);
+//		this.solver.addObject(do1);
+//		this.solver.addObject(do2);
+//		DistanceConstraint dc = new DistanceConstraint(do1, do2);
+//		dc.show = true;
+//		this.solver.addConstraint(dc);
+//
+//		VerletObject so1 = new VerletObject(new Vector2f(this.worldSize.x * .25f, this.worldSize.y * .25f), 20.f);
+//		so1.color = new Vector3f(0.f, 0.f, 1.f);
+//		so1.fixed = true;
+//		VerletObject so2 = new VerletObject(new Vector2f(this.worldSize.x * .25f, -this.worldSize.y * .25f), 20.f);
+//		this.solver.addObject(so1);
+//		this.solver.addObject(so2);
+//		SpringConstraint sc = new SpringConstraint(so1, so2, .1f);
+//		sc.show = true;
+//		this.solver.addConstraint(sc);
 	}
 	
 	private void addCube(Vector2f pos, Vector3f color, float width, float height, float objRadius, float springForce)
@@ -254,21 +256,21 @@ public class Main
 	
 	private void fixedUpdate(float dt)
 	{
-//		if (this.solver.getObjectCount() < 2000 && (this.fixedFrameCount % 4) == 0)
-//		{
-//			final float radius = RandUtil.getRange(5.f, 10.f);
-//
-//			Vector2f velocity = new Vector2f(500.f, 0.f);
-//			VerletObject obj = new VerletObject(new Vector2f(-this.worldSize.y * .5f * .95f, this.worldSize.y * .5f * .75f), radius);
-////			Vector2f velocity = new Vector2f(500.f * Math.sin(this.solver.getTime()), -400.f);
-////			VerletObject obj = new VerletObject(new Vector2f(0.f, this.worldSize.y * .5f * .75f), radius);
-//
-//			obj.color = this.getRainbow(this.solver.getTime() * .5f);
-//			obj.elasticity = .5f;
-//			obj.setVelocity(velocity, this.solver.getStepDt());
-//
-//			this.solver.addObject(obj);
-//		}
+		if (this.solver.getObjectCount() < 2000 && (this.fixedFrameCount % 4) == 0)
+		{
+			final float radius = RandUtil.getRange(5.f, 10.f);
+
+			Vector2f velocity = new Vector2f(500.f, 0.f);
+			VerletObject obj = new VerletObject(new Vector2f(-this.worldSize.y * .5f * .95f, this.worldSize.y * .5f * .75f), radius);
+//			Vector2f velocity = new Vector2f(500.f * Math.sin(this.solver.getTime()), -400.f);
+//			VerletObject obj = new VerletObject(new Vector2f(0.f, this.worldSize.y * .5f * .75f), radius);
+
+			obj.color = this.getRainbow(this.solver.getTime() * .5f);
+			obj.elasticity = .5f;
+			obj.setVelocity(velocity, this.solver.getStepDt());
+
+			this.solver.addObject(obj);
+		}
 		
 		this.solver.update(dt);
 	}
