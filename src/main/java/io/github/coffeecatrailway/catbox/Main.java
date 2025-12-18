@@ -47,10 +47,10 @@ public class Main
 	};
 	
 	// Timing
-	private int frameCount = 0, fixedFrameCount = 0;
-	private int ticksPerSecond = 60;
-	private float cycleTime = 1.f / (float) ticksPerSecond;
-	private final Timer sysTimer = new Timer(), updateTimer = new Timer();
+	private int totalFrames = 0, totalFixedFrames = 0;
+	private int fixedUpdatesPerSecond = 60;
+	private float fixedUpdateInterval = 1.f / (float) fixedUpdatesPerSecond;
+	private final Timer timer = new Timer();
 	
 	private void init()
 	{
@@ -77,6 +77,8 @@ public class Main
 		this.window.setFramebufferCallback((window, width, height) -> this.updateTransform((float) width, (float) height));
 		this.updateTransform((float) this.window.getWidth(), (float) this.window.getHeight());
 		
+		this.timer.init();
+		
 		this.imgui.init(this.window.getHandle());
 		
 		this.shapeRenderer = new ShapeRenderer(100);
@@ -88,7 +90,7 @@ public class Main
 		this.solver = new Solver(this.worldSize.x, this.worldSize.y);
 //		this.solver.setConstraint(new Vector2f(0.f), this.worldView);// * 1.4f
 		this.solver.setSubSteps(8);
-		this.solver.setTps(this.ticksPerSecond);
+		this.solver.setTps(this.fixedUpdatesPerSecond);
 		
 		this.solver.gravity.set(0.f, -400.f);
 
@@ -267,7 +269,7 @@ public class Main
 	
 	private void fixedUpdate(float dt)
 	{
-		if (this.solver.getObjectCount() < 2000 && (this.fixedFrameCount % 2) == 0)
+		if (this.solver.getObjectCount() < 2000 && (this.totalFixedFrames % 2) == 0)
 		{
 			final float radius = RandUtil.getRange(2.5f, 10.f);
 			
@@ -301,7 +303,11 @@ public class Main
 		if (ImGui.begin("Info"))
 		{
 			windowWidth = ImGui.getWindowWidth();
-			ImGui.text(String.format("FPS: %f\nFrames: %d\tFixed Frames: %d", ImGui.getIO().getFramerate(), this.frameCount, this.fixedFrameCount));
+			ImGui.text(String.format("ImGUI FPS: %f", ImGui.getIO().getFramerate()));
+			ImGui.text(String.format("Total Frames: %d\nTotal Fixed Frames: %d", this.totalFrames, this.totalFixedFrames));
+			ImGui.text(String.format("FPS: %d\tUPS: %d", this.timer.getFPS(), this.timer.getUPS()));
+			ImGui.separator();
+			
 			ImGui.text(String.format("World Size: %.1f/%.1f", this.worldSize.x, this.worldSize.y));
 			ImGui.text(String.format("Window size: %d/%d", this.window.getWidth(), this.window.getHeight()));
 			if (ImGui.checkbox("Vsync", this.vSync))
@@ -336,18 +342,15 @@ public class Main
 			}
 			ImGui.separator();
 			
-			ImGui.text(String.format("Delta time: %fs", this.sysTimer.getElapsedSeconds()));
-			ImGui.text(String.format("Fixed delta time: %fs", this.updateTimer.getElapsedSeconds()));
-			
 			ImGui.pushItemWidth(windowWidth * .5f);
-			int[] vi = {this.ticksPerSecond};
-			if (ImGui.dragInt("Ticks Per Second", vi, 10, 10, 100, "%d"))
+			int[] vi = {this.fixedUpdatesPerSecond};
+			if (ImGui.dragInt("Updates Per Second", vi, 10, 10, 100, "%d"))
 			{
-				this.ticksPerSecond = vi[0];
-				this.cycleTime = 1.f / (float) this.ticksPerSecond;
-				this.solver.setTps(this.ticksPerSecond);
+				this.fixedUpdatesPerSecond = vi[0];
+				this.fixedUpdateInterval = 1.f / (float) this.fixedUpdatesPerSecond;
+				this.solver.setTps(this.fixedUpdatesPerSecond);
 			}
-			ImGui.text(String.format("Cycle time (1/tps): %fs", this.cycleTime));
+			ImGui.text(String.format("Cycle time (1/tps): %fs", this.fixedUpdateInterval));
 			ImGui.popItemWidth();
 			ImGui.separator();
 		}
@@ -363,31 +366,32 @@ public class Main
 	
 	private void run()
 	{
-		float accumulatedSeconds = 0.f;
-		this.sysTimer.tick();
-		this.updateTimer.tick();
+		float delta, accumulator = 0.f;
 		
 		System.out.println("Starting main loop");
 		while (!glfwWindowShouldClose(this.window.getHandle()))
 		{
-			// Get amount of time passed for one cycle
-			this.sysTimer.tick();
-			accumulatedSeconds += this.sysTimer.getElapsedSeconds();
+			delta = this.timer.getDelta();
+			accumulator += delta;
 			
 			// update
-			this.update(this.sysTimer.getElapsedSeconds());
+			this.update(delta);
 			
-			if (accumulatedSeconds > this.cycleTime)
+			if (accumulator > this.fixedUpdateInterval)
 			{
-				accumulatedSeconds -= this.cycleTime;
-				this.updateTimer.tick();
+				accumulator -= this.fixedUpdateInterval;
+				this.timer.updateUPS();
+				
 				if (!this.pauseFixed || this.btnStepFixed)
 				{
-					this.fixedUpdate(this.updateTimer.getElapsedSeconds());
-					this.fixedFrameCount++;
+					this.fixedUpdate(this.fixedUpdateInterval);
+					this.totalFixedFrames++;
 					this.btnStepFixed = false;
 				}
 			}
+			
+			this.timer.updateFPS();
+			this.timer.update();
 			
 			this.imgui.update();
 			this.gui();
@@ -397,7 +401,7 @@ public class Main
 			glClear(GL_COLOR_BUFFER_BIT);
 			
 			this.render();
-			this.frameCount++;
+			this.totalFrames++;
 			
 			// Swap buffer & poll events
 			glfwSwapBuffers(this.window.getHandle());
