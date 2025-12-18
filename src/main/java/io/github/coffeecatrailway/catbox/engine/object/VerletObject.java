@@ -1,7 +1,7 @@
-package io.github.coffeecatrailway.engine.physics.object;
+package io.github.coffeecatrailway.catbox.engine.object;
 
-import io.github.coffeecatrailway.engine.render.LineRenderer;
-import io.github.coffeecatrailway.engine.render.ShapeRenderer;
+import io.github.coffeecatrailway.catbox.graphics.LineRenderer;
+import io.github.coffeecatrailway.catbox.graphics.ShapeRenderer;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 

@@ -1,4 +1,4 @@
-package io.github.coffeecatrailway.catbox;
+package io.github.coffeecatrailway.catbox.engine;
 
 import org.joml.Random;
 import org.joml.Vector2f;

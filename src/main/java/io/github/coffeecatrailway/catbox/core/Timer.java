@@ -1,4 +1,4 @@
-package io.github.coffeecatrailway.catbox;
+package io.github.coffeecatrailway.catbox.core;
 
 import static org.lwjgl.glfw.GLFW.glfwGetTimerFrequency;
 import static org.lwjgl.glfw.GLFW.glfwGetTimerValue;

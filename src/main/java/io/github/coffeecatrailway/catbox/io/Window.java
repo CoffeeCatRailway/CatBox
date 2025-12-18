@@ -1,4 +1,4 @@
-package io.github.coffeecatrailway.engine.window;
+package io.github.coffeecatrailway.catbox.io;
 
 import org.lwjgl.glfw.Callbacks;
 import org.lwjgl.glfw.GLFWErrorCallback;
