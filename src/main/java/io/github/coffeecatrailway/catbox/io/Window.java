@@ -52,6 +52,13 @@ public class Window
 		});
 	}
 	
+	public void render()
+	{
+		// Swap buffer & poll events
+		glfwSwapBuffers(this.handle);
+		glfwPollEvents();
+	}
+	
 	public void destroy()
 	{
 		System.out.println("Destroying window");

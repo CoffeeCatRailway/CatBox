@@ -403,9 +403,7 @@ public class Main
 			this.render();
 			this.totalFrames++;
 			
-			// Swap buffer & poll events
-			glfwSwapBuffers(this.window.getHandle());
-			glfwPollEvents();
+			this.window.render();
 		}
 	}
 	
