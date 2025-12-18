@@ -22,20 +22,9 @@ public class Window
 		this.height = height;
 	}
 	
-	public void init(String title, boolean vSync, int platform)
+	public void init(String title, boolean vSync)
 	{
 		System.out.println("Creating window");
-		
-		// Setup an error callback. The default implementation
-		// will print the error message in System.err.
-		GLFWErrorCallback.createPrint(System.err).set();
-		glfwInitHint(GLFW_PLATFORM, platform);
-		
-		// Initialize GLFW. Most GLFW functions will not work before doing this.
-		System.out.println("Initializing GLFW");
-		if ( !glfwInit() ) {
-			throw new IllegalStateException("Unable to initialize GLFW");
-		}
 		
 		glfwDefaultWindowHints();
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
@@ -45,6 +34,7 @@ public class Window
 		this.handle = glfwCreateWindow(this.width, this.height, title, NULL, NULL);
 		
 		if (this.handle == NULL) {
+			glfwTerminate();
 			throw new RuntimeException("Failed to create the GLFW window");
 		}
 		
@@ -67,7 +57,6 @@ public class Window
 		System.out.println("Destroying window");
 		Callbacks.glfwFreeCallbacks(this.handle);
 		glfwDestroyWindow(this.handle);
-		glfwTerminate();
 	}
 	
 	public long getHandle()

@@ -11,12 +11,12 @@ import io.github.coffeecatrailway.catbox.graphics.LineRenderer;
 import io.github.coffeecatrailway.catbox.graphics.ShapeRenderer;
 import io.github.coffeecatrailway.catbox.io.ImGUIWrapper;
 import io.github.coffeecatrailway.catbox.io.Window;
-import org.joml.Math;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
+import org.joml.Math;
 import org.lwjgl.Version;
-import org.lwjgl.glfw.GLFWFramebufferSizeCallbackI;
+import org.lwjgl.glfw.GLFWErrorCallback;
 
 import java.util.Locale;
 
@@ -58,13 +58,23 @@ public class Main
 		System.out.println("LWJGL: " + Version.getVersion());
 		System.out.println("ImGUI: " + ImGui.getVersion());
 		
-		this.window = new Window(1000, 800);
+		// Setup an error callback. The default implementation
+		// will print the error message in System.err.
+		GLFWErrorCallback.createPrint(System.err).set();
+		
 		// Hacky and wrong-ish, I use wayland not x11
 		final int platform = System.getProperty("os.name").toLowerCase(Locale.ROOT).contains("linux") ? GLFW_PLATFORM_X11 : GLFW_ANY_PLATFORM;
-		this.window.init("CatBox", this.vSync, platform);
-
-		GLFWFramebufferSizeCallbackI callback = (window, width, height) -> this.updateTransform((float) width, (float) height);
-		this.window.setFramebufferCallback(callback);
+		glfwInitHint(GLFW_PLATFORM, platform);
+		
+		// Initialize GLFW. Most GLFW functions will not work before doing this.
+		System.out.println("Initializing GLFW");
+		if (!glfwInit())
+			throw new IllegalStateException("Unable to initialize GLFW");
+		
+		this.window = new Window(1000, 800);
+		this.window.init("CatBox", this.vSync);
+		
+		this.window.setFramebufferCallback((window, width, height) -> this.updateTransform((float) width, (float) height));
 		this.updateTransform((float) this.window.getWidth(), (float) this.window.getHeight());
 		
 		this.imgui.init(this.window.getHandle());
@@ -81,15 +91,15 @@ public class Main
 		this.solver.setTps(this.ticksPerSecond);
 		
 		this.solver.gravity.set(0.f, -400.f);
-		
+
 //		VerletObject obj1 = new VerletObject(new Vector2f(100.f), 20.f);
 //		this.solver.addObject(obj1);
 //		obj1.setVelocity(new Vector2f(0.f , -200.f), this.solver.getStepDt());
-		
+
 //		VerletObject obj2 = new VerletObject(new Vector2f(-100.f), 20.f);
 //		this.solver.addObject(obj2);
 //		obj2.setVelocity(new Vector2f(0.f , 200.f), this.solver.getStepDt());
-		
+
 //		VerletObject lo1 = new VerletObject(new Vector2f(-200.f, 0.f), 10.f);
 ////		lo1.fixed = true;
 //		this.solver.addObject(lo1);
@@ -105,7 +115,7 @@ public class Main
 //
 //		DistanceConstraint distConstraint = new DistanceConstraint(lo1, lo2);
 //		this.solver.addConstraint(distConstraint);
-		
+
 //		VerletObject chainObjLast = new VerletObject(new Vector2f(-165.f, 0.f), 10.f);
 //		chainObjLast.elasticity = .75f;
 //		chainObjLast.fixed = true;
@@ -125,7 +135,7 @@ public class Main
 //			chainObjLast = chainObj;
 //		}
 //		chainObjLast.fixed = true;
-		
+
 //		this.addCube(new Vector2f(-200.f, -55.f), new Vector3f(1.f), 50.f, 50.f, 5.f, 1.f);
 //		this.addCube(new Vector2f(0.f, -55.f), new Vector3f(.5f), 50.f, 50.f, 5.f, .5f);
 //		this.addCube(new Vector2f(200.f, -55.f), new Vector3f(.25f), 50.f, 50.f, 5.f, .25f);
@@ -134,7 +144,7 @@ public class Main
 //		this.addCube(new Vector2f(200.f, 55.f), new Vector3f(.25f), 50.f, 100.f, 5.f, .25f);
 		
 		this.addCube(new Vector2f(0.f), new Vector3f(1.f), this.worldSize.x - 20.f, 300.f, 10.f, 4.f);
-		
+
 //		this.addCube(new Vector2f(0.f, 0.f), new Vector3f(1.f), this.worldSize.x * .45f * 2.f, 200.f, 10.f, 4.f);
 //
 //		VerletObject wo1 = new VerletObject(new Vector2f(-this.worldSize.x * .45f - 20.f, -this.worldSize.y * .5f * .9f), 10.f);
@@ -159,7 +169,7 @@ public class Main
 //
 //		LineObject wl3 = new LineObject(wo1, wo3);
 //		this.solver.addLineObj(wl3);
-		
+
 //		VerletObject lo1 = new VerletObject(new Vector2f(-this.worldSize.x * .25f, this.worldSize.y * .25f), 20.f);
 //		lo1.color = new Vector3f(1.f, 0.f, 0.f);
 //		lo1.fixed = true;
@@ -260,16 +270,16 @@ public class Main
 		if (this.solver.getObjectCount() < 2000 && (this.fixedFrameCount % 2) == 0)
 		{
 			final float radius = RandUtil.getRange(2.5f, 10.f);
-
+			
 			Vector2f velocity = new Vector2f(700.f, 0.f);
 			VerletObject obj = new VerletObject(new Vector2f(-this.worldSize.y * .5f * .95f, this.worldSize.y * .5f * .75f), radius);
 //			Vector2f velocity = new Vector2f(500.f * Math.sin(this.solver.getTime()), -400.f);
 //			VerletObject obj = new VerletObject(new Vector2f(0.f, this.worldSize.y * .5f * .75f), radius);
-
+			
 			obj.color = this.getRainbow(this.solver.getTime() * .5f);
 			obj.elasticity = .5f;
 			obj.setVelocity(velocity, this.solver.getStepDt());
-
+			
 			this.solver.addObject(obj);
 		}
 		
@@ -403,6 +413,8 @@ public class Main
 		this.shapeRenderer.destroy();
 		this.imgui.destroy();
 		this.window.destroy();
+		
+		glfwTerminate();
 	}
 	
 	public static void main(String[] args)
