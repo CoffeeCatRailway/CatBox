@@ -163,7 +163,7 @@ public class Solver
 		this.objects.sort(Comparator.comparingInt(o -> (int) (o.position.x - o.radius)));
 	}
 	
-	public void update(float dt)
+	public void update()
 	{
 		this.time += this.frameDt;
 		final float stepDt = this.getStepDt();

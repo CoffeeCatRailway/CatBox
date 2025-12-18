@@ -267,7 +267,7 @@ public class Main
 		return new Vector3f(r, g, b);
 	}
 	
-	private void fixedUpdate(float dt)
+	private void fixedUpdate()
 	{
 		if (this.solver.getObjectCount() < 2000 && (this.totalFixedFrames % 2) == 0)
 		{
@@ -285,7 +285,7 @@ public class Main
 			this.solver.addObject(obj);
 		}
 		
-		this.solver.update(dt);
+		this.solver.update();
 	}
 	
 	private void render()
@@ -352,7 +352,6 @@ public class Main
 			}
 			ImGui.text(String.format("Cycle time (1/tps): %fs", this.fixedUpdateInterval));
 			ImGui.popItemWidth();
-			ImGui.separator();
 		}
 		ImGui.end();
 		
@@ -384,7 +383,7 @@ public class Main
 				
 				if (!this.pauseFixed || this.btnStepFixed)
 				{
-					this.fixedUpdate(this.fixedUpdateInterval);
+					this.fixedUpdate();
 					this.totalFixedFrames++;
 					this.btnStepFixed = false;
 				}
