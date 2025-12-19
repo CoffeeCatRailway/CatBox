@@ -14,7 +14,6 @@ import java.util.Comparator;
 
 public class Solver
 {
-	private int subSteps = 8;
 	public final Vector2f gravity = new Vector2f(0.f);
 	
 	private final Vector2f worldCenter = new Vector2f(0.f);
@@ -24,6 +23,8 @@ public class Solver
 	private final ArrayList<LineObject> lineObjects = new ArrayList<>();
 	private final ArrayList<Constraint> constraints = new ArrayList<>();
 	
+	private int subSteps = 8, totalSteps = 0;
+	private boolean pause = true, btnStep = false;
 	private float time = 0.f, frameDt = 1.f / 60.f;
 	
 	public Solver(float worldWidth, float worldHeight)
@@ -165,34 +166,30 @@ public class Solver
 	
 	public void update()
 	{
-		this.time += this.frameDt;
-		final float stepDt = this.getStepDt();
-		for (int i = 0; i < this.subSteps; i++)
+		if (!this.pause || this.btnStep)
 		{
-			this.sortObjectsByLeft();
-			this.checkCollisions(stepDt);
+			this.time += this.frameDt;
+			final float stepDt = this.getStepDt();
+			for (int i = 0; i < this.subSteps; i++)
+			{
+				this.sortObjectsByLeft();
+				this.checkCollisions(stepDt);
+				
+				for (Constraint constraint : this.constraints)
+					constraint.update(stepDt);
+				
+				this.updateObjects(stepDt);
+			}
 			
-			for (Constraint constraint : this.constraints)
-				constraint.update(stepDt);
-			
-			this.updateObjects(stepDt);
+			this.totalSteps++;
+			this.btnStep = false;
 		}
-	}
-	
-	public void setTps(int rate)
-	{
-		this.frameDt = 1.f / (float) rate;
 	}
 	
 	public void setWorldConstraint(Vector2f pos, float width, float height)
 	{
 		this.worldCenter.set(pos);
 		this.worldSize.set(width, height);
-	}
-	
-	public void setSubSteps(int subSteps)
-	{
-		this.subSteps = subSteps;
 	}
 	
 	public boolean addObject(VerletObject obj)
@@ -230,14 +227,29 @@ public class Solver
 		return this.constraints.size();
 	}
 	
-	public float getStepDt()
+	public void setSubSteps(int subSteps)
 	{
-		return this.frameDt / (float) this.subSteps;
+		this.subSteps = subSteps;
+	}
+	
+	public int getTotalSteps()
+	{
+		return this.totalSteps;
+	}
+	
+	public void setTps(int rate)
+	{
+		this.frameDt = 1.f / (float) rate;
 	}
 	
 	public float getTime()
 	{
 		return this.time;
+	}
+	
+	public float getStepDt()
+	{
+		return this.frameDt / (float) this.subSteps;
 	}
 	
 	public void render(ShapeRenderer shapeRenderer, LineRenderer lineRenderer)
@@ -268,8 +280,16 @@ public class Solver
 		ImGui.separator();
 		
 		ImGui.text(String.format("Time elapsed: %f", this.time));
-		ImGui.text(String.format("Sub steps: %d", this.subSteps));
 		ImGui.text(String.format("Frame dt: %f", this.frameDt));
+		ImGui.text(String.format("Sub steps: %d\tTotal Steps: %d", this.subSteps, this.totalSteps));
+		if (ImGui.checkbox("Pause Fixed", this.pause))
+			this.pause = !this.pause;
+		if (this.pause)
+		{
+			ImGui.sameLine(0.f, 10.f);
+			if (ImGui.smallButton("Step"))
+				this.btnStep = true;
+		}
 		ImGui.separator();
 		
 		ImGui.pushItemWidth(windowWidth * .5f);

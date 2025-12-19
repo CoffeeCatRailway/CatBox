@@ -39,7 +39,7 @@ public class Main
 	private Solver solver;
 	
 	// Options
-	private boolean vSync = false, pauseFixed = true, btnStepFixed = false;
+	private boolean vSync = false;
 	private final Vector2f worldSize = new Vector2f(1000.f, 1000.f);
 	
 	private final float[] backgroundColor = {
@@ -50,9 +50,9 @@ public class Main
 	};
 	
 	// Timing
-	private int totalFrames = 0, totalFixedFrames = 0;
-	private int fixedUpdatesPerSecond = 60;
-	private float fixedUpdateInterval = 1.f / (float) fixedUpdatesPerSecond;
+	private int totalFrames = 0;
+	private int ups = 60;
+	private float updateInterval = 1.f / (float) ups;
 	private final Timer timer = new Timer();
 	
 	private void init()
@@ -94,7 +94,7 @@ public class Main
 		this.solver = new Solver(this.worldSize.x, this.worldSize.y);
 //		this.solver.setConstraint(new Vector2f(0.f), this.worldView);// * 1.4f
 		this.solver.setSubSteps(8);
-		this.solver.setTps(this.fixedUpdatesPerSecond);
+		this.solver.setTps(this.ups);
 		
 		this.solver.gravity.set(0.f, -400.f);
 
@@ -268,10 +268,10 @@ public class Main
 		return new Vector3f(r, g, b);
 	}
 	
-	private void fixedUpdate()
+	private void update()
 	{
 //		if (this.solver.getObjectCount() < 2000 && (this.totalFixedFrames % 2) == 0)
-		if (IOHandler.isKeyPressed(GLFW_KEY_SPACE) && (this.totalFixedFrames % 2) == 0)
+		if (IOHandler.isKeyPressed(GLFW_KEY_SPACE) && (this.solver.getTotalSteps() % 2) == 0)
 //		if (InputHandler.isKeyJustPressed(GLFW_KEY_SPACE))
 		{
 			final float radius = RandUtil.getRange(2.5f, 10.f);
@@ -307,7 +307,7 @@ public class Main
 		{
 			windowWidth = ImGui.getWindowWidth();
 			ImGui.text(String.format("ImGUI FPS: %f", ImGui.getIO().getFramerate()));
-			ImGui.text(String.format("Total Frames: %d\nTotal Fixed Frames: %d", this.totalFrames, this.totalFixedFrames));
+			ImGui.text(String.format("Total Frames: %d", this.totalFrames));
 			ImGui.text(String.format("FPS: %d\tUPS: %d", this.timer.getFPS(), this.timer.getUPS()));
 			ImGui.text(String.format("Mouse Pos: (%f,%f)", IOHandler.MOUSE_POS.x, IOHandler.MOUSE_POS.y));
 			ImGui.separator();
@@ -318,14 +318,6 @@ public class Main
 			{
 				this.vSync = !this.vSync;
 				this.window.setVSync(this.vSync);
-			}
-			if (ImGui.checkbox("Pause Fixed", this.pauseFixed))
-				this.pauseFixed = !this.pauseFixed;
-			if (this.pauseFixed)
-			{
-				ImGui.sameLine(0.f, 10.f);
-				if (ImGui.smallButton("Step"))
-					this.btnStepFixed = true;
 			}
 			ImGui.separator();
 			
@@ -347,14 +339,14 @@ public class Main
 			ImGui.separator();
 			
 			ImGui.pushItemWidth(windowWidth * .5f);
-			int[] vi = {this.fixedUpdatesPerSecond};
+			int[] vi = {this.ups};
 			if (ImGui.dragInt("Updates Per Second", vi, 10, 10, 100, "%d"))
 			{
-				this.fixedUpdatesPerSecond = vi[0];
-				this.fixedUpdateInterval = 1.f / (float) this.fixedUpdatesPerSecond;
-				this.solver.setTps(this.fixedUpdatesPerSecond);
+				this.ups = vi[0];
+				this.updateInterval = 1.f / (float) this.ups;
+				this.solver.setTps(this.ups);
 			}
-			ImGui.text(String.format("Cycle time (1/tps): %fs", this.fixedUpdateInterval));
+			ImGui.text(String.format("Cycle time (1/tps): %fs", this.updateInterval));
 			ImGui.popItemWidth();
 		}
 		ImGui.end();
@@ -377,17 +369,12 @@ public class Main
 			delta = this.timer.getDelta();
 			accumulator += delta;
 			
-			if (accumulator > this.fixedUpdateInterval)
+			if (accumulator > this.updateInterval)
 			{
-				accumulator -= this.fixedUpdateInterval;
+				accumulator -= this.updateInterval;
 				this.timer.updateUPS();
 				
-				if (!this.pauseFixed || this.btnStepFixed)
-				{
-					this.fixedUpdate();
-					this.totalFixedFrames++;
-					this.btnStepFixed = false;
-				}
+				this.update();
 				IOHandler.update();
 			}
 			
