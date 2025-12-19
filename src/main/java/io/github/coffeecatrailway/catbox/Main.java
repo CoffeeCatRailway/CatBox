@@ -29,6 +29,8 @@ public class Main
 	private Window window;
 	private final ImGUIWrapper imgui = new ImGUIWrapper();
 	
+	private GLFWErrorCallback errorCallback;
+	
 	private final Matrix4f transformMatrix = new Matrix4f();
 	private ShapeRenderer shapeRenderer;
 	private LineRenderer lineRenderer;
@@ -60,7 +62,7 @@ public class Main
 		
 		// Setup an error callback. The default implementation
 		// will print the error message in System.err.
-		GLFWErrorCallback.createPrint(System.err).set();
+		this.errorCallback = GLFWErrorCallback.createPrint(System.err).set();
 		
 		// Hacky and wrong-ish, I use wayland not x11
 		final int platform = System.getProperty("os.name").toLowerCase(Locale.ROOT).contains("linux") ? GLFW_PLATFORM_X11 : GLFW_ANY_PLATFORM;
@@ -414,6 +416,8 @@ public class Main
 		this.shapeRenderer.destroy();
 		this.imgui.destroy();
 		this.window.destroy();
+		
+		this.errorCallback.free();
 		
 		glfwTerminate();
 	}
