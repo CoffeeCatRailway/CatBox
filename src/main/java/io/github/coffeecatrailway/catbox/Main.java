@@ -40,7 +40,7 @@ public class Main
 	
 	// Options
 	private boolean vSync = false, pauseFixed = true, btnStepFixed = false;
-	private final Vector2f worldSize = new Vector2f(1000.f, 800.f);
+	private final Vector2f worldSize = new Vector2f(1000.f, 1000.f);
 	
 	private final float[] backgroundColor = {
 			// 0.f, 0.f, 0.f
@@ -74,7 +74,7 @@ public class Main
 		if (!glfwInit())
 			throw new IllegalStateException("Unable to initialize GLFW");
 		
-		this.window = new Window(1000, 800);
+		this.window = new Window(1280, 720);
 		this.window.init("CatBox", this.vSync);
 		
 		this.window.setFramebufferCallback((window, width, height) -> this.updateTransform((float) width, (float) height));
@@ -89,6 +89,7 @@ public class Main
 		
 		this.lineRenderer = new LineRenderer(100);
 		this.lineRenderer.init();
+		this.lineRenderer.enabled = false;
 		
 		this.solver = new Solver(this.worldSize.x, this.worldSize.y);
 //		this.solver.setConstraint(new Vector2f(0.f), this.worldView);// * 1.4f
