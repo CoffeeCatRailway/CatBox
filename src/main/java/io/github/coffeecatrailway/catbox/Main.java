@@ -10,7 +10,7 @@ import io.github.coffeecatrailway.catbox.engine.object.constraint.SpringConstrai
 import io.github.coffeecatrailway.catbox.graphics.LineRenderer;
 import io.github.coffeecatrailway.catbox.graphics.ShapeRenderer;
 import io.github.coffeecatrailway.catbox.io.ImGUIWrapper;
-import io.github.coffeecatrailway.catbox.io.InputHandler;
+import io.github.coffeecatrailway.catbox.io.IOHandler;
 import io.github.coffeecatrailway.catbox.io.Window;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
@@ -259,9 +259,6 @@ public class Main
 			this.transformMatrix.setOrtho(-width, width, -(simAspect / windowAspect) * height, (simAspect / windowAspect) * height, -1.f, 1.f);
 	}
 	
-	private void update(float dt)
-	{}
-	
 	private Vector3f getRainbow(float t)
 	{
 		final float r = Math.sin(t) * .5f + .5f;
@@ -273,7 +270,7 @@ public class Main
 	private void fixedUpdate()
 	{
 //		if (this.solver.getObjectCount() < 2000 && (this.totalFixedFrames % 2) == 0)
-		if (InputHandler.isKeyPressed(GLFW_KEY_SPACE) && (this.totalFixedFrames % 2) == 0)
+		if (IOHandler.isKeyPressed(GLFW_KEY_SPACE) && (this.totalFixedFrames % 2) == 0)
 //		if (InputHandler.isKeyJustPressed(GLFW_KEY_SPACE))
 		{
 			final float radius = RandUtil.getRange(2.5f, 10.f);
@@ -311,6 +308,7 @@ public class Main
 			ImGui.text(String.format("ImGUI FPS: %f", ImGui.getIO().getFramerate()));
 			ImGui.text(String.format("Total Frames: %d\nTotal Fixed Frames: %d", this.totalFrames, this.totalFixedFrames));
 			ImGui.text(String.format("FPS: %d\tUPS: %d", this.timer.getFPS(), this.timer.getUPS()));
+			ImGui.text(String.format("Mouse Pos: (%f,%f)", IOHandler.MOUSE_POS.x, IOHandler.MOUSE_POS.y));
 			ImGui.separator();
 			
 			ImGui.text(String.format("World Size: %.1f/%.1f", this.worldSize.x, this.worldSize.y));
@@ -378,9 +376,6 @@ public class Main
 			delta = this.timer.getDelta();
 			accumulator += delta;
 			
-			// update
-			this.update(delta);
-			
 			if (accumulator > this.fixedUpdateInterval)
 			{
 				accumulator -= this.fixedUpdateInterval;
@@ -392,7 +387,7 @@ public class Main
 					this.totalFixedFrames++;
 					this.btnStepFixed = false;
 				}
-				InputHandler.update();
+				IOHandler.update();
 			}
 			
 			this.timer.updateFPS();

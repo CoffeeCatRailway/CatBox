@@ -50,7 +50,7 @@ public class Window
 			if (this.framebufferCallback != null)
 				this.framebufferCallback.invoke(window, width, height);
 		});
-		glfwSetKeyCallback(this.handle, new InputHandler());
+		IOHandler.setCallbacks(this.handle);
 	}
 	
 	public void render()
