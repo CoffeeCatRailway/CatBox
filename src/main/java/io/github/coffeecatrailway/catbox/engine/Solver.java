@@ -15,9 +15,7 @@ import java.util.Comparator;
 public class Solver
 {
 	public final Vector2f gravity = new Vector2f(0.f);
-	
-	private final Vector2f worldCenter = new Vector2f(0.f);
-	private final Vector2f worldSize;
+	public final Vector2f worldSize;
 	
 	private final ArrayList<VerletObject> objects = new ArrayList<>();
 	private final ArrayList<LineObject> lineObjects = new ArrayList<>();
@@ -186,10 +184,50 @@ public class Solver
 		}
 	}
 	
-	public void setWorldConstraint(Vector2f pos, float width, float height)
+	public void render(ShapeRenderer shapeRenderer, LineRenderer lineRenderer)
 	{
-		this.worldCenter.set(pos);
-		this.worldSize.set(width, height);
+		shapeRenderer.pushBox(new Vector2f(0.f), new Vector3f(.15f), this.worldSize, 0.f, 10.f);
+		
+		for (Constraint constraint : this.constraints)
+			constraint.render(shapeRenderer, lineRenderer);
+		
+		for (LineObject lineObj : this.lineObjects)
+			lineObj.render(shapeRenderer, lineRenderer);
+		
+		for (VerletObject obj : this.objects)
+			obj.render(this.frameDt, shapeRenderer, lineRenderer);
+	}
+	
+	public void destroy()
+	{
+		System.out.println("Destroying Solver");
+	}
+	
+	public void gui(float windowWidth)
+	{
+		ImGui.text(String.format("Objects: %d", this.objects.size()));
+		ImGui.text(String.format("Line Objects: %d", this.lineObjects.size()));
+		ImGui.text(String.format("Constraints: %d", this.constraints.size()));
+		ImGui.separator();
+		
+		ImGui.text(String.format("Time elapsed: %f", this.time));
+		ImGui.text(String.format("Frame dt: %f", this.frameDt));
+		ImGui.text(String.format("Sub steps: %d\tTotal Steps: %d", this.subSteps, this.totalSteps));
+		if (ImGui.checkbox("Pause Fixed", this.pause))
+			this.pause = !this.pause;
+		if (this.pause)
+		{
+			ImGui.sameLine(0.f, 10.f);
+			if (ImGui.smallButton("Step"))
+				this.btnStep = true;
+		}
+		ImGui.separator();
+		
+		ImGui.pushItemWidth(windowWidth * .5f);
+		float[] gravity = new float[] {this.gravity.x, this.gravity.y};
+		if (ImGui.inputFloat2("Gravity", gravity, "%.2f"))
+			this.gravity.set(gravity);
+		ImGui.popItemWidth();
 	}
 	
 	public boolean addObject(VerletObject obj)
@@ -250,52 +288,5 @@ public class Solver
 	public float getStepDt()
 	{
 		return this.frameDt / (float) this.subSteps;
-	}
-	
-	public void render(ShapeRenderer shapeRenderer, LineRenderer lineRenderer)
-	{
-//		shapeRenderer.pushCircle(this.constraintCenter, new Vector3f(0.15f), this.constraintRadius, 0.f);
-		shapeRenderer.pushBox(this.worldCenter, new Vector3f(.15f), this.worldSize, 0.f, 10.f);
-		
-		for (Constraint constraint : this.constraints)
-			constraint.render(shapeRenderer, lineRenderer);
-		
-		for (LineObject lineObj : this.lineObjects)
-			lineObj.render(shapeRenderer, lineRenderer);
-		
-		for (VerletObject obj : this.objects)
-			obj.render(this.frameDt, shapeRenderer, lineRenderer);
-	}
-	
-	public void destroy()
-	{
-		System.out.println("Destroying Solver");
-	}
-	
-	public void gui(float windowWidth)
-	{
-		ImGui.text(String.format("Objects: %d", this.objects.size()));
-		ImGui.text(String.format("Line Objects: %d", this.lineObjects.size()));
-		ImGui.text(String.format("Constraints: %d", this.constraints.size()));
-		ImGui.separator();
-		
-		ImGui.text(String.format("Time elapsed: %f", this.time));
-		ImGui.text(String.format("Frame dt: %f", this.frameDt));
-		ImGui.text(String.format("Sub steps: %d\tTotal Steps: %d", this.subSteps, this.totalSteps));
-		if (ImGui.checkbox("Pause Fixed", this.pause))
-			this.pause = !this.pause;
-		if (this.pause)
-		{
-			ImGui.sameLine(0.f, 10.f);
-			if (ImGui.smallButton("Step"))
-				this.btnStep = true;
-		}
-		ImGui.separator();
-		
-		ImGui.pushItemWidth(windowWidth * .5f);
-		float[] gravity = new float[] {this.gravity.x, this.gravity.y};
-		if (ImGui.inputFloat2("Gravity", gravity))
-			this.gravity.set(gravity);
-		ImGui.popItemWidth();
 	}
 }
