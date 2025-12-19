@@ -10,6 +10,7 @@ import io.github.coffeecatrailway.catbox.engine.object.constraint.SpringConstrai
 import io.github.coffeecatrailway.catbox.graphics.LineRenderer;
 import io.github.coffeecatrailway.catbox.graphics.ShapeRenderer;
 import io.github.coffeecatrailway.catbox.io.ImGUIWrapper;
+import io.github.coffeecatrailway.catbox.io.InputHandler;
 import io.github.coffeecatrailway.catbox.io.Window;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
@@ -271,7 +272,9 @@ public class Main
 	
 	private void fixedUpdate()
 	{
-		if (this.solver.getObjectCount() < 2000 && (this.totalFixedFrames % 2) == 0)
+//		if (this.solver.getObjectCount() < 2000 && (this.totalFixedFrames % 2) == 0)
+		if (InputHandler.isKeyPressed(GLFW_KEY_SPACE) && (this.totalFixedFrames % 2) == 0)
+//		if (InputHandler.isKeyJustPressed(GLFW_KEY_SPACE))
 		{
 			final float radius = RandUtil.getRange(2.5f, 10.f);
 			
@@ -389,6 +392,7 @@ public class Main
 					this.totalFixedFrames++;
 					this.btnStepFixed = false;
 				}
+				InputHandler.update();
 			}
 			
 			this.timer.updateFPS();

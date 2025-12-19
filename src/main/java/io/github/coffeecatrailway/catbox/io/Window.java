@@ -1,7 +1,6 @@
 package io.github.coffeecatrailway.catbox.io;
 
 import org.lwjgl.glfw.Callbacks;
-import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWFramebufferSizeCallbackI;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
@@ -33,7 +32,8 @@ public class Window
 		glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
 		this.handle = glfwCreateWindow(this.width, this.height, title, NULL, NULL);
 		
-		if (this.handle == NULL) {
+		if (this.handle == NULL)
+		{
 			glfwTerminate();
 			throw new RuntimeException("Failed to create the GLFW window");
 		}
@@ -50,6 +50,7 @@ public class Window
 			if (this.framebufferCallback != null)
 				this.framebufferCallback.invoke(window, width, height);
 		});
+		glfwSetKeyCallback(this.handle, new InputHandler());
 	}
 	
 	public void render()
