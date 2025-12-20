@@ -50,9 +50,8 @@ public class Main
 	};
 	
 	// Timing
-	private int totalFrames = 0;
-	private int ups = 60;
-	private float updateInterval = 1.f / (float) ups;
+	private int totalFrames = 0, targetUps = 60;
+	private float updateInterval = 1.f / (float) targetUps;
 	private final Timer timer = new Timer();
 	
 	private void init()
@@ -93,7 +92,7 @@ public class Main
 		
 		this.solver = new Solver(this.worldSize.x, this.worldSize.y);
 		this.solver.setSubSteps(8);
-		this.solver.setTps(this.ups);
+		this.solver.setTps(this.targetUps);
 		
 		this.solver.gravity.set(0.f, -400.f);
 		
@@ -313,12 +312,12 @@ public class Main
 			ImGui.separator();
 			
 			ImGui.pushItemWidth(windowWidth * .5f);
-			int[] vi = {this.ups};
+			int[] vi = {this.targetUps};
 			if (ImGui.dragInt("Updates Per Second", vi, 10, 10, 100, "%d"))
 			{
-				this.ups = vi[0];
-				this.updateInterval = 1.f / (float) this.ups;
-				this.solver.setTps(this.ups);
+				this.targetUps = vi[0];
+				this.updateInterval = 1.f / (float) this.targetUps;
+				this.solver.setTps(this.targetUps);
 			}
 			ImGui.text(String.format("Cycle time (1/tps): %fs", this.updateInterval));
 			ImGui.popItemWidth();
