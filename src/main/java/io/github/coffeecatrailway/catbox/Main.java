@@ -9,13 +9,13 @@ import io.github.coffeecatrailway.catbox.engine.object.VerletObject;
 import io.github.coffeecatrailway.catbox.engine.object.constraint.SpringConstraint;
 import io.github.coffeecatrailway.catbox.graphics.LineRenderer;
 import io.github.coffeecatrailway.catbox.graphics.ShapeRenderer;
-import io.github.coffeecatrailway.catbox.io.ImGUIWrapper;
 import io.github.coffeecatrailway.catbox.io.IOHandler;
+import io.github.coffeecatrailway.catbox.io.ImGUIWrapper;
 import io.github.coffeecatrailway.catbox.io.Window;
+import org.joml.Math;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
-import org.joml.Math;
 import org.lwjgl.Version;
 import org.lwjgl.glfw.GLFWErrorCallback;
 
@@ -92,29 +92,25 @@ public class Main
 		this.lineRenderer.enabled = false;
 		
 		this.solver = new Solver(this.worldSize.x, this.worldSize.y);
-//		this.solver.setConstraint(new Vector2f(0.f), this.worldView);// * 1.4f
 		this.solver.setSubSteps(8);
 		this.solver.setTps(this.ups);
 		
 		this.solver.gravity.set(0.f, -400.f);
-
+		
+		// Line & Distance constraint test
 //		VerletObject obj1 = new VerletObject(new Vector2f(100.f), 20.f);
 //		this.solver.addObject(obj1);
 //		obj1.setVelocity(new Vector2f(0.f , -200.f), this.solver.getStepDt());
-
+//
 //		VerletObject obj2 = new VerletObject(new Vector2f(-100.f), 20.f);
 //		this.solver.addObject(obj2);
 //		obj2.setVelocity(new Vector2f(0.f , 200.f), this.solver.getStepDt());
-
+//
 //		VerletObject lo1 = new VerletObject(new Vector2f(-200.f, 0.f), 10.f);
-////		lo1.fixed = true;
 //		this.solver.addObject(lo1);
-////		lo1.setVelocity(new Vector2f(0.f, 200.f), this.solver.getStepDt());
 //
 //		VerletObject lo2 = new VerletObject(new Vector2f(200.f, 0.f), 10.f);
-////		lo2.fixed = true;
 //		this.solver.addObject(lo2);
-////		lo2.setVelocity(new Vector2f(0.f, 200.f), this.solver.getStepDt());
 //
 //		LineObject lineObj = new LineObject(lo1, lo2, 20.f);
 //		this.solver.addLineObj(lineObj);
@@ -122,6 +118,7 @@ public class Main
 //		DistanceConstraint distConstraint = new DistanceConstraint(lo1, lo2);
 //		this.solver.addConstraint(distConstraint);
 
+		// Rope Test
 //		VerletObject chainObjLast = new VerletObject(new Vector2f(-165.f, 0.f), 10.f);
 //		chainObjLast.elasticity = .75f;
 //		chainObjLast.fixed = true;
@@ -142,6 +139,7 @@ public class Main
 //		}
 //		chainObjLast.fixed = true;
 
+		// Cube spring test
 //		this.addCube(new Vector2f(-200.f, -55.f), new Vector3f(1.f), 50.f, 50.f, 5.f, 1.f);
 //		this.addCube(new Vector2f(0.f, -55.f), new Vector3f(.5f), 50.f, 50.f, 5.f, .5f);
 //		this.addCube(new Vector2f(200.f, -55.f), new Vector3f(.25f), 50.f, 50.f, 5.f, .25f);
@@ -149,38 +147,14 @@ public class Main
 //		this.addCube(new Vector2f(0.f, 55.f), new Vector3f(.5f), 100.f, 100.f, 5.f, .5f);
 //		this.addCube(new Vector2f(200.f, 55.f), new Vector3f(.25f), 50.f, 100.f, 5.f, .25f);
 		
-		this.addCube(new Vector2f(0.f), new Vector3f(1.f), this.worldSize.x - 20.f, 300.f, 10.f, 4.f);
+		// Trampoline
+//		this.addCube(new Vector2f(0.f), new Vector3f(1.f), this.worldSize.x - 20.f, 300.f, 10.f, 4.f);
 
-//		this.addCube(new Vector2f(0.f, 0.f), new Vector3f(1.f), this.worldSize.x * .45f * 2.f, 200.f, 10.f, 4.f);
-//
-//		VerletObject wo1 = new VerletObject(new Vector2f(-this.worldSize.x * .45f - 20.f, -this.worldSize.y * .5f * .9f), 10.f);
-//		wo1.fixed = true;
-//		this.solver.addObject(wo1);
-//		VerletObject wo2 = new VerletObject(new Vector2f(-this.worldSize.x * .45f - 20.f, this.worldSize.y * .5f * .8f), 10.f);
-//		wo2.fixed = true;
-//		this.solver.addObject(wo2);
-//
-//		LineObject wl1 = new LineObject(wo1, wo2);
-//		this.solver.addLineObj(wl1);
-//
-//		VerletObject wo3 = new VerletObject(new Vector2f(this.worldSize.x * .45f + 20.f, -this.worldSize.y * .5f * .9f), 10.f);
-//		wo3.fixed = true;
-//		this.solver.addObject(wo3);
-//		VerletObject wo4 = new VerletObject(new Vector2f(this.worldSize.x * .45f + 20.f, this.worldSize.y * .5f * .8f), 10.f);
-//		wo4.fixed = true;
-//		this.solver.addObject(wo4);
-//
-//		LineObject wl2 = new LineObject(wo3, wo4);
-//		this.solver.addLineObj(wl2);
-//
-//		LineObject wl3 = new LineObject(wo1, wo3);
-//		this.solver.addLineObj(wl3);
-
+		// Constraint test
 //		VerletObject lo1 = new VerletObject(new Vector2f(-this.worldSize.x * .25f, this.worldSize.y * .25f), 20.f);
 //		lo1.color = new Vector3f(1.f, 0.f, 0.f);
 //		lo1.fixed = true;
 //		VerletObject lo2 = new VerletObject(new Vector2f(-this.worldSize.x * .25f, -this.worldSize.y * .25f), 20.f);
-////		lo2.show = false;
 //		this.solver.addObject(lo1);
 //		this.solver.addObject(lo2);
 //		this.solver.addLineObj(new LineObject(lo1, lo2));
