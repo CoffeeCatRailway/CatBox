@@ -61,7 +61,7 @@ public class Solver
 			for (int j = i + 1; j < this.objects.size(); j++)
 			{
 				VerletObject obj2 = this.objects.get(j);
-				if ((obj2.position.x - obj2.radius) > (obj1.position.x + obj1.radius)) break;
+				if ((obj2.position.x - obj2.radius) > (obj1.position.x + obj1.radius)) break; // obj2.left > obj1.right
 				this.solveObjectObjectContact(obj1, obj2);
 			}
 
@@ -160,6 +160,7 @@ public class Solver
 	private void sortObjectsByLeft()
 	{
 		this.objects.sort(Comparator.comparingInt(o -> (int) (o.position.x - o.radius)));
+//		this.objects.sort((o1, o2) -> (int) (o1.position.x - o1.radius) - (int) (o2.position.x - o2.radius));
 	}
 	
 	public void update()
