@@ -1,6 +1,8 @@
-package io.github.coffeecatrailway.catbox.engine;
+package io.github.coffeecatrailway.catbox.engine.solver;
 
 import imgui.ImGui;
+import io.github.coffeecatrailway.catbox.engine.ObjectEdge;
+import io.github.coffeecatrailway.catbox.engine.RandUtil;
 import io.github.coffeecatrailway.catbox.engine.object.LineObject;
 import io.github.coffeecatrailway.catbox.engine.object.VerletObject;
 import io.github.coffeecatrailway.catbox.engine.object.constraint.Constraint;
@@ -8,14 +10,16 @@ import io.github.coffeecatrailway.catbox.graphics.LineRenderer;
 import io.github.coffeecatrailway.catbox.graphics.ShapeRenderer;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
+import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 
-public class Solver
+public class SolverLegacy
 {
 	public final Vector2f gravity = new Vector2f(0.f);
 	public final Vector2f worldSize;
+	
+	private final ArrayList<ObjectEdge> edges = new ArrayList<>();
 	
 	private final ArrayList<VerletObject> objects = new ArrayList<>();
 	private final ArrayList<LineObject> lineObjects = new ArrayList<>();
@@ -24,8 +28,9 @@ public class Solver
 	private int subSteps = 8, totalSteps = 0;
 	private boolean pause = true, btnStep = false;
 	private float time = 0.f, frameDt = 1.f / 60.f;
+	private double updateTime = 0.;
 	
-	public Solver(float worldWidth, float worldHeight)
+	public SolverLegacy(float worldWidth, float worldHeight)
 	{
 		this.worldSize = new Vector2f(worldWidth, worldHeight);
 	}
@@ -57,7 +62,7 @@ public class Solver
 		for (int i = 0; i < this.objects.size(); i++)
 		{
 			VerletObject obj1 = this.objects.get(i);
-			// obj-obj
+			// object-object
 			for (int j = i + 1; j < this.objects.size(); j++)
 			{
 				VerletObject obj2 = this.objects.get(j);
@@ -65,7 +70,7 @@ public class Solver
 				this.solveObjectObjectContact(obj1, obj2);
 			}
 
-			// obj-line
+			// object-line
 			for (LineObject lineObj : this.lineObjects)
 			{
 				if (obj1 == lineObj.obj1 || obj1 == lineObj.obj2)
@@ -84,7 +89,7 @@ public class Solver
 				// Check if ball is colliding with line end
 				if (distAlongLine < 0.f || distAlongLine > lineObj.getLength())
 				{
-					// Check what end the obj is colliding with
+					// Check what end the object is colliding with
 					if (distAlongLine < 0.f)
 						obj1.position.sub(lineObj.obj1.position, normal).normalize();
 					else
@@ -122,15 +127,15 @@ public class Solver
 	
 	private void applyWorldConstraint(VerletObject obj)
 	{
-//		Vector2f dir = this.constraintCenter.sub(obj.position, new Vector2f());
+//		Vector2f dir = this.constraintCenter.sub(object.position, new Vector2f());
 //		final float dist = dir.length();
-//		if (dist > this.constraintRadius - obj.radius)
+//		if (dist > this.constraintRadius - object.radius)
 //		{
 //			dir.normalize();
-//			this.constraintCenter.sub(dir.mul(this.constraintRadius - obj.radius), obj.position);
+//			this.constraintCenter.sub(dir.mul(this.constraintRadius - object.radius), object.position);
 //
-////				final float force = .5f * obj.elasticity * (this.constraintRadius - (this.constraintRadius - obj.radius));
-////				obj.position.add(dir.mul(force / obj.radius));
+////				final float force = .5f * object.elasticity * (this.constraintRadius - (this.constraintRadius - object.radius));
+////				object.position.add(dir.mul(force / object.radius));
 //		}
 
 		final float halfWidth = this.worldSize.x * .5f;
@@ -141,7 +146,7 @@ public class Solver
 		
 		final float halfHeight = this.worldSize.y * .5f;
 		if (obj.position.y < -halfHeight + obj.radius)
-//			obj.position.y -= (Math.abs(-halfHeight + obj.radius) - Math.abs(obj.position.y)) * obj.elasticity;
+//			object.position.y -= (Math.abs(-halfHeight + object.radius) - Math.abs(object.position.y)) * object.elasticity;
 			obj.position.y = -halfHeight + obj.radius;
 		else if (obj.position.y > halfHeight - obj.radius)
 			obj.position.y = halfHeight - obj.radius;
@@ -159,18 +164,105 @@ public class Solver
 
 	private void sortObjectsByLeft()
 	{
-		this.objects.sort(Comparator.comparingInt(o -> (int) (o.position.x - o.radius)));
+//		double then = GLFW.glfwGetTime();
+		
+//		this.objects.sort(Comparator.comparingInt(o -> (int) (o.position.x - o.radius)));
 //		this.objects.sort((o1, o2) -> (int) (o1.position.x - o1.radius) - (int) (o2.position.x - o2.radius));
+		this.objects.sort((o1, o2) -> Float.compare(o1.position.x - o1.radius, o2.position.x - o2.radius)); // ~10μs
+		
+		// Insertion sort ~2μs
+//		for (int i = 1; i < this.objects.size(); i++)
+//		{
+//			for (int j = i - 1; j >= 0; j--)
+//			{
+//				if (this.objects.get(j).position.x > this.objects.get(j + 1).position.x)
+//					break;
+//
+//				// swap [edges[j], edges[j + 1]] = [edges[j + 1], edges[j]];
+//				VerletObject edge = this.objects.get(j);
+//				this.objects.set(j, this.objects.get(j + 1));
+//				this.objects.set(j + 1, edge);
+//			}
+//		}
+		
+//		double now = GLFW.glfwGetTime();
+//		System.out.printf("Object sort took %fμs\n", (now - then) * 1_000_000);
 	}
 	
+	private void sortEdges()
+	{
+//		this.edges.sort((e1, e2) -> Float.compare(e1.getEdgeX(), e2.getEdgeX()));
+		
+		// Insertion sort
+		for (int i  = 1; i < this.edges.size(); i++)
+		{
+			for (int j = i - 1; j >= 0; j--)
+			{
+				if (this.edges.get(j).getEdgeX() < this.edges.get(j + 1).getEdgeX())
+					break;
+				
+				// swap [edges[j], edges[j + 1]] = [edges[j + 1], edges[j]];
+				ObjectEdge edge = this.edges.get(j);
+				this.edges.set(j, this.edges.get(j + 1));
+				this.edges.set(j + 1, edge);
+			}
+		}
+	}
+	
+//	HashMap<Integer, Pair<VerletObject, VerletObject>> overlapping = new HashMap<>();
 	public void update()
 	{
 		if (!this.pause || this.btnStep)
 		{
+			double then = GLFW.glfwGetTime();
+			
 			this.time += this.frameDt;
 			final float stepDt = this.getStepDt();
 			for (int i = 0; i < this.subSteps; i++)
 			{
+//				this.sortEdges();
+//
+//				final HashSet<VerletObject> touching = new HashSet<>();
+//				for (ObjectEdge edge : this.edges)
+//				{
+//					if (edge.isLeft())
+//					{
+//						for (VerletObject other : touching)
+//							this.solveObjectObjectContact(other, edge.object());
+//
+//						touching.add(edge.object());
+//					} else
+//						touching.remove(edge.object());
+//				}
+				
+				// Insertion sort + overlap check
+//				for (int j  = 1; j < this.edges.size(); j++)
+//				{
+//					for (int k = j - 1; k >= 0; k--)
+//					{
+//						if (this.edges.get(k).getEdgeX() < this.edges.get(k + 1).getEdgeX())
+//							break;
+//
+//						// swap [edges[j], edges[j + 1]] = [edges[j + 1], edges[j]];
+//						ObjectEdge edge = this.edges.get(k);
+//						this.edges.set(k, this.edges.get(k + 1));
+//						this.edges.set(k + 1, edge);
+//
+//						edge = this.edges.get(k);
+//						ObjectEdge edge2 = this.edges.get(k + 1);
+//
+//						Pair<VerletObject, VerletObject> pair = new Pair<>(edge.object(), edge2.object());
+//						if (edge.isLeft() && !edge2.isLeft())
+//							overlapping.put(pair.hashCode(), pair);
+//						else if (!edge.isLeft() && edge2.isLeft())
+//							overlapping.remove(pair.hashCode());
+//					}
+//				}
+//
+//				System.out.println(overlapping.size());
+//				for (Pair<VerletObject, VerletObject> overlap : overlapping.values())
+//					this.solveObjectObjectContact(overlap.first(), overlap.second());
+				
 				this.sortObjectsByLeft();
 				this.checkCollisions(stepDt);
 				
@@ -179,6 +271,9 @@ public class Solver
 				
 				this.updateObjects(stepDt);
 			}
+			
+			double now = GLFW.glfwGetTime();
+			this.updateTime = (now - then) * 1_000;
 			
 			this.totalSteps++;
 			this.btnStep = false;
@@ -213,6 +308,7 @@ public class Solver
 		
 		ImGui.text(String.format("Time elapsed: %f", this.time));
 		ImGui.text(String.format("Frame dt: %f", this.frameDt));
+		ImGui.text(String.format("Update time: %fms", this.updateTime));
 		ImGui.text(String.format("Sub steps: %d\tTotal Steps: %d", this.subSteps, this.totalSteps));
 		if (ImGui.checkbox("Pause Fixed", this.pause))
 			this.pause = !this.pause;
@@ -233,6 +329,8 @@ public class Solver
 	
 	public boolean addObject(VerletObject obj)
 	{
+		this.edges.add(new ObjectEdge(obj, true));
+		this.edges.add(new ObjectEdge(obj, false));
 		return this.objects.add(obj);
 	}
 	

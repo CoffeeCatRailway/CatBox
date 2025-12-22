@@ -3,7 +3,7 @@ package io.github.coffeecatrailway.catbox;
 import imgui.ImGui;
 import io.github.coffeecatrailway.catbox.core.Timer;
 import io.github.coffeecatrailway.catbox.engine.RandUtil;
-import io.github.coffeecatrailway.catbox.engine.Solver;
+import io.github.coffeecatrailway.catbox.engine.solver.SolverLegacy;
 import io.github.coffeecatrailway.catbox.engine.object.LineObject;
 import io.github.coffeecatrailway.catbox.engine.object.VerletObject;
 import io.github.coffeecatrailway.catbox.engine.object.constraint.SpringConstraint;
@@ -36,7 +36,7 @@ public class Main
 	private ShapeRenderer shapeRenderer;
 	private LineRenderer lineRenderer;
 	
-	private Solver solver;
+	private SolverLegacy solver;
 	
 	// Options
 	private boolean vSync = false;
@@ -90,7 +90,7 @@ public class Main
 		this.lineRenderer.init();
 		this.lineRenderer.enabled = false;
 		
-		this.solver = new Solver(this.worldSize.x, this.worldSize.y);
+		this.solver = new SolverLegacy(this.worldSize.x, this.worldSize.y);
 		this.solver.setSubSteps(8);
 		this.solver.setTps(this.targetUps);
 		
