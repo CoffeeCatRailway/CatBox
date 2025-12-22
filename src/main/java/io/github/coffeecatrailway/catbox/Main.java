@@ -3,10 +3,12 @@ package io.github.coffeecatrailway.catbox;
 import imgui.ImGui;
 import io.github.coffeecatrailway.catbox.core.Timer;
 import io.github.coffeecatrailway.catbox.engine.RandUtil;
+import io.github.coffeecatrailway.catbox.engine.solver.Solver;
 import io.github.coffeecatrailway.catbox.engine.solver.SolverLegacy;
 import io.github.coffeecatrailway.catbox.engine.object.LineObject;
 import io.github.coffeecatrailway.catbox.engine.object.VerletObject;
 import io.github.coffeecatrailway.catbox.engine.object.constraint.SpringConstraint;
+import io.github.coffeecatrailway.catbox.engine.solver.SolverSweepPruneSimple;
 import io.github.coffeecatrailway.catbox.graphics.LineRenderer;
 import io.github.coffeecatrailway.catbox.graphics.ShapeRenderer;
 import io.github.coffeecatrailway.catbox.io.IOHandler;
@@ -36,7 +38,7 @@ public class Main
 	private ShapeRenderer shapeRenderer;
 	private LineRenderer lineRenderer;
 	
-	private SolverLegacy solver;
+	private Solver solver;
 	
 	// Options
 	private boolean vSync = false;
@@ -90,8 +92,8 @@ public class Main
 		this.lineRenderer.init();
 		this.lineRenderer.enabled = false;
 		
-		this.solver = new SolverLegacy(this.worldSize.x, this.worldSize.y);
-		this.solver.setSubSteps(8);
+		this.solver = new SolverSweepPruneSimple(this.worldSize.x, this.worldSize.y, 8);
+//		this.solver.setSubSteps(8);
 		this.solver.setTps(this.targetUps);
 		
 		this.solver.gravity.set(0.f, -400.f);
@@ -255,7 +257,7 @@ public class Main
 //			VerletObject obj = new VerletObject(new Vector2f(0.f, this.worldSize.y * .5f * .75f), radius);
 			
 			obj.color = this.getRainbow(this.solver.getTime() * .5f);
-			obj.elasticity = .5f;
+			obj.elasticity = 1.f;
 			obj.setVelocity(velocity, this.solver.getStepDt());
 			
 			this.solver.addObject(obj);
