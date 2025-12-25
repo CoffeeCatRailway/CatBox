@@ -166,8 +166,14 @@ public abstract class Solver
 		System.out.println("Destroying Solver");
 	}
 	
+	ArrayList<Double> updateTimes = new ArrayList<>();
+	int updateTimeAvg = 60;
 	public void gui(float windowWidth)
 	{
+		updateTimes.add(this.updateTime);
+		if (updateTimes.size() > updateTimeAvg)
+			updateTimes.removeFirst();
+		
 		ImGui.text(String.format("Solver: %s", this.title));
 		ImGui.separator();
 		
