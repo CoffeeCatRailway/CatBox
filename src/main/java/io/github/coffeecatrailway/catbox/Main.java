@@ -245,9 +245,8 @@ public class Main
 	
 	private void update()
 	{
-//		if (this.solver.getObjectCount() < 2000 && (this.totalFixedFrames % 2) == 0)
-		if (IOHandler.isKeyPressed(GLFW_KEY_SPACE) && (this.solver.getTotalSteps() % 2) == 0)
-//		if (InputHandler.isKeyJustPressed(GLFW_KEY_SPACE))
+		if (!this.solver.isPaused() && this.solver.getObjectCount() < 4000 && (this.solver.getTotalSteps() % 2) == 0)
+//		if (IOHandler.isKeyPressed(GLFW_KEY_SPACE) && (this.solver.getTotalSteps() % 2) == 0)
 		{
 			final float radius = RandUtil.getRange(2.5f, 10.f);
 			

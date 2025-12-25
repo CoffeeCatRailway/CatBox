@@ -8,7 +8,7 @@ public class SolverSweepPruneSimple extends Solver
 {
 	public SolverSweepPruneSimple(float worldWidth, float worldHeight, int subSteps)
 	{
-		super(worldWidth, worldHeight, subSteps);
+		super("Sweep & Prune Simple", worldWidth, worldHeight, subSteps);
 	}
 	
 	private void sortObjectsByLeft()

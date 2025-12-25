@@ -15,6 +15,7 @@ import java.util.ArrayList;
 
 public abstract class Solver
 {
+	private final String title;
 	public final Vector2f gravity = new Vector2f(0.f);
 	public final Vector2f worldSize;
 	
@@ -27,8 +28,9 @@ public abstract class Solver
 	private float time = 0.f, frameDt = 1.f / 60.f;
 	private double updateTime = 0.;
 	
-	public Solver(float worldWidth, float worldHeight, int subSteps)
+	public Solver(String title, float worldWidth, float worldHeight, int subSteps)
 	{
+		this.title = title;
 		this.worldSize = new Vector2f(worldWidth, worldHeight);
 		this.subSteps = subSteps;
 	}
@@ -166,14 +168,19 @@ public abstract class Solver
 	
 	public void gui(float windowWidth)
 	{
+		ImGui.text(String.format("Solver: %s", this.title));
+		ImGui.separator();
+		
 		ImGui.text(String.format("Objects: %d", this.objects.size()));
 		ImGui.text(String.format("Line Objects: %d", this.lineObjects.size()));
 		ImGui.text(String.format("Constraints: %d", this.constraints.size()));
 		ImGui.separator();
 		
-		ImGui.text(String.format("Time elapsed: %f", this.time));
-		ImGui.text(String.format("Frame dt: %f", this.frameDt));
+		ImGui.text(String.format("Time elapsed: %fs", this.time));
+		ImGui.text(String.format("Frame dt: %fs", this.frameDt));
 		ImGui.text(String.format("Update time: %fms", this.updateTime));
+		double avg = updateTimes.stream().mapToDouble(Double::doubleValue).sum() / (double) updateTimes.size();
+		ImGui.text(String.format("Avg(%d) update time: %fms", updateTimeAvg, avg));
 		ImGui.text(String.format("Sub steps: %d\tTotal Steps: %d", this.subSteps, this.totalSteps));
 		if (ImGui.checkbox("Pause Fixed", this.pause))
 			this.pause = !this.pause;
@@ -237,9 +244,9 @@ public abstract class Solver
 		return this.totalSteps;
 	}
 	
-	public void setTps(int rate)
+	public boolean isPaused()
 	{
-		this.frameDt = 1.f / (float) rate;
+		return this.pause;
 	}
 	
 	public float getTime()
@@ -250,5 +257,10 @@ public abstract class Solver
 	public float getStepDt()
 	{
 		return this.frameDt / (float) this.subSteps;
+	}
+	
+	public void setTps(int rate)
+	{
+		this.frameDt = 1.f / (float) rate;
 	}
 }
