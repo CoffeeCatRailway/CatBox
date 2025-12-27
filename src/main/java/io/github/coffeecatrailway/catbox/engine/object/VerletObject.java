@@ -5,6 +5,8 @@ import io.github.coffeecatrailway.catbox.graphics.ShapeRenderer;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 
+import java.util.Objects;
+
 public class VerletObject
 {
 	public Vector2f position, positionLast, acceleration;
@@ -26,6 +28,20 @@ public class VerletObject
 		this.radius = radius;
 		this.friction = friction;
 		this.elasticity = elasticity;
+	}
+	
+	@Override
+	public boolean equals(Object o)
+	{
+		if (o == null || getClass() != o.getClass()) return false;
+		VerletObject object = (VerletObject) o;
+		return this.position.equals(object.position) && Float.compare(this.radius, object.radius) == 0 && this.color.equals(object.color);
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		return Objects.hash(this.position, this.color, this.radius);
 	}
 	
 	public void update(float dt)

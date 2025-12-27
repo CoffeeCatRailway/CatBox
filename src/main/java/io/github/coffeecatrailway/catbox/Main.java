@@ -7,7 +7,6 @@ import io.github.coffeecatrailway.catbox.engine.solver.SolverSimple;
 import io.github.coffeecatrailway.catbox.engine.object.LineObject;
 import io.github.coffeecatrailway.catbox.engine.object.VerletObject;
 import io.github.coffeecatrailway.catbox.engine.object.constraint.SpringConstraint;
-import io.github.coffeecatrailway.catbox.engine.solver.SolverSweepPruneSimple;
 import io.github.coffeecatrailway.catbox.graphics.LineRenderer;
 import io.github.coffeecatrailway.catbox.graphics.ShapeRenderer;
 import io.github.coffeecatrailway.catbox.io.IOHandler;
@@ -92,6 +91,7 @@ public class Main
 //		this.lineRenderer.enabled = false;
 		
 		this.solver = new SolverSimple(this.worldSize.x, this.worldSize.y, 8);
+//		this.solver = new SolverSweepPrune(this.worldSize.x, this.worldSize.y, 8);
 //		this.solver.setSubSteps(8);
 		this.solver.setTps(this.targetUps);
 		
