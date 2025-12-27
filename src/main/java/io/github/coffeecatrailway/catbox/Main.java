@@ -3,8 +3,7 @@ package io.github.coffeecatrailway.catbox;
 import imgui.ImGui;
 import io.github.coffeecatrailway.catbox.core.Timer;
 import io.github.coffeecatrailway.catbox.engine.RandUtil;
-import io.github.coffeecatrailway.catbox.engine.solver.Solver;
-import io.github.coffeecatrailway.catbox.engine.solver.SolverLegacy;
+import io.github.coffeecatrailway.catbox.engine.solver.SolverSimple;
 import io.github.coffeecatrailway.catbox.engine.object.LineObject;
 import io.github.coffeecatrailway.catbox.engine.object.VerletObject;
 import io.github.coffeecatrailway.catbox.engine.object.constraint.SpringConstraint;
@@ -38,7 +37,7 @@ public class Main
 	private ShapeRenderer shapeRenderer;
 	private LineRenderer lineRenderer;
 	
-	private Solver solver;
+	private SolverSimple solver;
 	
 	// Options
 	private boolean vSync = false;
@@ -90,13 +89,18 @@ public class Main
 		
 		this.lineRenderer = new LineRenderer(100);
 		this.lineRenderer.init();
-		this.lineRenderer.enabled = false;
+//		this.lineRenderer.enabled = false;
 		
-		this.solver = new SolverSweepPruneSimple(this.worldSize.x, this.worldSize.y, 8);
+		this.solver = new SolverSimple(this.worldSize.x, this.worldSize.y, 8);
 //		this.solver.setSubSteps(8);
 		this.solver.setTps(this.targetUps);
 		
 		this.solver.gravity.set(0.f, -400.f);
+		
+		VerletObject o1 = new VerletObject(new Vector2f(-100.f, 0.f), 40.f);
+		o1.setVelocity(new Vector2f(100.f, 0.f), this.solver.getStepDt());
+		this.solver.addObject(o1);
+		this.solver.addObject(new VerletObject(new Vector2f(100.f, 0.f), 20.f));
 		
 		// Line & Distance constraint test
 //		VerletObject obj1 = new VerletObject(new Vector2f(100.f), 20.f);
@@ -245,8 +249,8 @@ public class Main
 	
 	private void update()
 	{
-		if (!this.solver.isPaused() && this.solver.getObjectCount() < 4000 && (this.solver.getTotalSteps() % 2) == 0)
-//		if (IOHandler.isKeyPressed(GLFW_KEY_SPACE) && (this.solver.getTotalSteps() % 2) == 0)
+//		if (!this.solver.isPaused() && this.solver.getObjectCount() < 4000 && (this.solver.getTotalSteps() % 2) == 0)
+		if (IOHandler.isKeyPressed(GLFW_KEY_SPACE) && (this.solver.getTotalSteps() % 2) == 0)
 		{
 			final float radius = RandUtil.getRange(2.5f, 10.f);
 			

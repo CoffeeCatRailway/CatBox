@@ -7,13 +7,14 @@ import io.github.coffeecatrailway.catbox.engine.object.VerletObject;
 import io.github.coffeecatrailway.catbox.engine.object.constraint.Constraint;
 import io.github.coffeecatrailway.catbox.graphics.LineRenderer;
 import io.github.coffeecatrailway.catbox.graphics.ShapeRenderer;
+import org.joml.Math;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
 
-public abstract class Solver
+public class SolverSimple
 {
 	private final String title;
 	public final Vector2f gravity = new Vector2f(0.f);
@@ -28,7 +29,12 @@ public abstract class Solver
 	private float time = 0.f, frameDt = 1.f / 60.f;
 	private double updateTime = 0.;
 	
-	public Solver(String title, float worldWidth, float worldHeight, int subSteps)
+	public SolverSimple(float worldWidth, float worldHeight, int subSteps)
+	{
+		this("Sweep Simple", worldWidth, worldHeight, subSteps);
+	}
+	
+	public SolverSimple(String title, float worldWidth, float worldHeight, int subSteps)
 	{
 		this.title = title;
 		this.worldSize = new Vector2f(worldWidth, worldHeight);
@@ -109,6 +115,30 @@ public abstract class Solver
 		}
 	}
 	
+	protected void sortObjects()
+	{
+		this.objects.sort((o1, o2) -> Float.compare(o1.position.x - o1.radius, o2.position.x - o2.radius)); // ~10μs
+	}
+	
+	protected void handleCollisions(float dt)
+	{
+		for (int i = 0; i < this.objects.size(); i++)
+		{
+			VerletObject obj1 = this.objects.get(i);
+			// object-object
+			for (int j = i + 1; j < this.objects.size(); j++)
+			{
+				VerletObject obj2 = this.objects.get(j);
+				if ((obj2.position.x - obj2.radius) > (obj1.position.x + obj1.radius)) break; // obj2.left > obj1.right
+				this.solveObjectObjectContact(obj1, obj2);
+			}
+			
+			// object-line
+			for (LineObject lineObj : this.lineObjects)
+				this.solveObjectLineContact(obj1, lineObj);
+		}
+	}
+	
 	protected void applyWorldConstraint(VerletObject obj)
 	{
 		final float halfWidth = this.worldSize.x * .5f;
@@ -124,7 +154,26 @@ public abstract class Solver
 			obj.position.y = halfHeight - obj.radius;
 	}
 	
-	public abstract void step(float stepDt);
+	protected void updateObjects(float dt)
+	{
+		for (VerletObject obj : this.objects)
+		{
+			obj.accelerate(this.gravity);
+			obj.update(dt);
+			this.applyWorldConstraint(obj);
+		}
+	}
+	
+	protected void step(float stepDt)
+	{
+		this.sortObjects();
+		this.handleCollisions(stepDt);
+		
+		for (Constraint constraint : this.constraints)
+			constraint.update(stepDt);
+		
+		this.updateObjects(stepDt);
+	}
 	
 	public void update()
 	{
@@ -135,9 +184,7 @@ public abstract class Solver
 			this.time += this.frameDt;
 			final float stepDt = this.getStepDt();
 			for (int i = 0; i < this.subSteps; i++)
-			{
 				this.step(stepDt);
-			}
 			
 			double now = GLFW.glfwGetTime();
 			this.updateTime = (now - then) * 1_000;
