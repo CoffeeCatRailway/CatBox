@@ -65,7 +65,7 @@ public class VerletObject
 	{
 		if (this.fixed)
 			return;
-		this.positionLast.set(this.position.sub(velocity.mul(dt, new Vector2f()), new Vector2f()));
+		this.position.sub(velocity.mul(dt, new Vector2f()), this.positionLast);
 	}
 	
 	public void addVelocity(Vector2f velocity, float dt)

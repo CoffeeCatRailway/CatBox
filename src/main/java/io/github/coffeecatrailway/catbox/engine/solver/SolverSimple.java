@@ -141,17 +141,39 @@ public class SolverSimple
 	
 	protected void applyWorldConstraint(VerletObject obj)
 	{
-		final float halfWidth = this.worldSize.x * .5f;
-		if (obj.position.x < -halfWidth + obj.radius)
-			obj.position.x = -halfWidth + obj.radius;
-		else if (obj.position.x > halfWidth - obj.radius)
-			obj.position.x = halfWidth - obj.radius;
+		Vector2f halfSize = this.worldSize.mul(.5f, new Vector2f()).sub(obj.radius, obj.radius);
+		Vector2f vel = obj.getVelocity(1.f).mul(obj.elasticity);
+		if (obj.position.x < -halfSize.x)
+		{
+			obj.position.x = -halfSize.x;
+			obj.positionLast.x = obj.position.x + vel.x;
+		} else if (obj.position.x > halfSize.x)
+		{
+			obj.position.x = halfSize.x;
+			obj.positionLast.x = obj.position.x + vel.x;
+		}
 		
-		final float halfHeight = this.worldSize.y * .5f;
-		if (obj.position.y < -halfHeight + obj.radius)
-			obj.position.y = -halfHeight + obj.radius;
-		else if (obj.position.y > halfHeight - obj.radius)
-			obj.position.y = halfHeight - obj.radius;
+		if (obj.position.y < -halfSize.y)
+		{
+			obj.position.y = -halfSize.y;
+			obj.positionLast.y = obj.position.y + vel.y;
+		} else if (obj.position.y > halfSize.y)
+		{
+			obj.position.y = halfSize.y;
+			obj.positionLast.y = obj.position.y + vel.y;
+		}
+		
+//		final float halfWidth = this.worldSize.x * .5f;
+//		if (obj.position.x < -halfWidth + obj.radius)
+//			obj.position.x = -halfWidth + obj.radius;
+//		else if (obj.position.x > halfWidth - obj.radius)
+//			obj.position.x = halfWidth - obj.radius;
+//
+//		final float halfHeight = this.worldSize.y * .5f;
+//		if (obj.position.y < -halfHeight + obj.radius)
+//			obj.position.y = -halfHeight + obj.radius;
+//		else if (obj.position.y > halfHeight - obj.radius)
+//			obj.position.y = halfHeight - obj.radius;
 	}
 	
 	protected void updateObjects(float dt)

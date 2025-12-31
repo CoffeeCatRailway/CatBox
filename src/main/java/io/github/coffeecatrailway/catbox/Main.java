@@ -97,10 +97,13 @@ public class Main
 		
 		this.solver.gravity.set(0.f, -400.f);
 		
-		VerletObject o1 = new VerletObject(new Vector2f(-100.f, 0.f), 40.f);
-		o1.setVelocity(new Vector2f(100.f, 0.f), this.solver.getStepDt());
+		VerletObject o1 = new VerletObject(new Vector2f(-100.f, 0.f), 20.f);
+//		o1.elasticity = .5f;
+		o1.setVelocity(new Vector2f(200.f, 0.f), this.solver.getStepDt());
 		this.solver.addObject(o1);
-		this.solver.addObject(new VerletObject(new Vector2f(100.f, 0.f), 20.f));
+		VerletObject o2 = new VerletObject(new Vector2f(100.f, 0.f), 20.f);
+//		o2.elasticity = .5f;
+		this.solver.addObject(o2);
 		
 		// Line & Distance constraint test
 //		VerletObject obj1 = new VerletObject(new Vector2f(100.f), 20.f);
@@ -329,7 +332,7 @@ public class Main
 		}
 		ImGui.end();
 		
-		if (ImGui.begin("Simulation"))
+		if (ImGui.begin("Solver"))
 		{
 			windowWidth = ImGui.getWindowWidth();
 			this.solver.gui(windowWidth);
